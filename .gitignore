@@ -30,3 +30,4 @@ favicon.ico
 index.php
 .htaccess
 robots.txt
+.DS_Store
