@@ -3,15 +3,15 @@
 		<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-                <a class="navbar-brand" href="index.html">Admin Panel</a>
+                <a class="navbar-brand" href="#/">Admin Panel</a>
             </div>
             <!-- Top Menu Items -->
             <ul class="nav navbar-right top-nav">
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> John Smith <b class="caret"></b></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> {{user.name}} <b class="caret"></b></a>
                     <ul class="dropdown-menu"> 
                         <li>
-                            <a href="#"><i class="fa fa-fw fa-power-off"></i> Log Out</a>
+                            <a href="/logout"><i class="fa fa-fw fa-power-off"></i> Log Out</a>
                         </li>
                     </ul>
                 </li>
@@ -19,11 +19,11 @@
             <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav side-nav">
-                    <li class="active">
-                        <a href=""><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
+                    <li @click="tabSwitch" :class="{'active': tabName == 'dashboard'}">
+                        <a v-link="{ path: '/'}" name="dashboard"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
                     </li>
-                    <li>
-                        <a href=""><i class="fa fa-fw fa-users"></i> Users</a>
+                    <li @click="tabSwitch" :class="{'active': tabName == 'users'}">
+                        <a v-link="{ path: '/users'}" name="users"><i class="fa fa-fw fa-users"></i> Users</a>
                     </li>
                 </ul>
             </div>
@@ -40,6 +40,27 @@
          </div>
 	</div>
 </template>
+
+<script>
+export default {
+	data () {
+		return {
+			user: pageObject.user,
+			tabName: "dashboard",
+			
+		}
+	},
+	methods: {
+		tabSwitch: function(event){
+			this.tabName = event.target.name;
+		},
+	},
+	created () {
+		var tempTagName = location.href.substr(location.href.lastIndexOf("#!") + 3) || "dashboard"
+		this.tabName = tempTagName
+	}
+}
+</script>
 
 <style>
 #wrapper {
