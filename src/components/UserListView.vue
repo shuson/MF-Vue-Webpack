@@ -14,17 +14,17 @@
 							<tr>
 								<th>ID</th>
 								<th>Name</th>
-								<th>Age</th>
-								<th>Status</th>
+								<th>Email</th>
+								<th>Country</th>
 								<th></th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr v-for="entry in data">
 								<td>{{entry['id']}}</td>
-								<td>{{entry['name']}}</td>
-								<td>{{entry['age']}}</td>
-								<td>{{entry['status']}}</td>
+								<td>{{entry['customer']['firstname']}}</td>
+								<td>{{entry['email']}}</td>
+								<td>{{entry['customer']['country']}}</td>
 								<td>
 									<div class="dropdown">
 									  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu{{entry['id']}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -70,8 +70,8 @@ export default {
 	}
   },  
   created(){
-	store.test().then(users => {
-		this.data = users
+	store.getUsers().then(data => {
+		this.data = data.data
 	})
   }
 }

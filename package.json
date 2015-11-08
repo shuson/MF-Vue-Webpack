@@ -1,5 +1,5 @@
 {
-  "name": "milesfair-admin",
+  "name": "milesfair",
   "version": "1.0.0",
   "description": "a vuejs powered backend of milesfair dashboard",
   "main": "main.js",

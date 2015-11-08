@@ -3,6 +3,8 @@ import { Promise } from 'es6-promise'
 
 const store = new EventEmitter()
 
+const baseUrl = 'http://milesfair.com:81/'
+
 export default store
 
 /**
@@ -34,6 +36,28 @@ store.test = () => {
 	])
 }
 
+/**
+ * get users list
+ *
+ * @param {string} id
+ * @return {Promise}
+ */
+store.getUsers = () => {
+	return new Promise((resolve, reject) => {
+		$.ajax({
+			type: 'GET',
+			url: baseUrl + 'users',
+			dataType: 'json',
+			success: function(data){
+				resolve(data)
+			},
+			fail: function(){
+
+			}
+		});
+	});
+}
+
 
 /**
  * ban user by id
@@ -54,3 +78,4 @@ store.banUser = id => {
 store.sendResetPasswordLink = id => {
 	return Promise.resolve("Successfully send link to " + id);
 }
+
