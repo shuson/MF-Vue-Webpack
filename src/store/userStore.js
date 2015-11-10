@@ -3,7 +3,7 @@ import { Promise } from 'es6-promise'
 
 const store = new EventEmitter()
 
-const baseUrl = 'http://milesfair.com:81/'
+const baseUrl = 'http://milesfair.com:81/api/'
 
 export default store
 
@@ -48,12 +48,20 @@ store.getUsers = () => {
 			type: 'GET',
 			url: baseUrl + 'users',
 			dataType: 'json',
+			beforeSend: function(xhr) {
+				xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+		  	},
 			success: function(data){
 				resolve(data)
 			},
-			fail: function(){
+			fail: function(xhr){
 
-			}
+			},
+			statusCode: {
+			   401: function() {
+			     window.open("http://milesfair.com:81/auth/logout","_self")
+			   }
+			 }
 		});
 	});
 }

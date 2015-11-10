@@ -15407,7 +15407,7 @@
 	
 	var store = new _events.EventEmitter();
 	
-	var baseUrl = 'http://milesfair.com:81/';
+	var baseUrl = 'http://milesfair.com:81/api/';
 	
 	exports['default'] = store;
 	
@@ -15448,10 +15448,18 @@
 				type: 'GET',
 				url: baseUrl + 'users',
 				dataType: 'json',
+				beforeSend: function beforeSend(xhr) {
+					xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+				},
 				success: function success(data) {
 					resolve(data);
 				},
-				fail: function fail() {}
+				fail: function fail(xhr) {},
+				statusCode: {
+					401: function _() {
+						window.open("http://milesfair.com:81/auth/logout", "_self");
+					}
+				}
 			});
 		});
 	};
