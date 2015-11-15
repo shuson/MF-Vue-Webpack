@@ -46,7 +46,7 @@ store.getUsers = () => {
 	return new Promise((resolve, reject) => {
 		$.ajax({
 			type: 'GET',
-			url: baseUrl + 'users',
+			url: baseUrl + 'user',
 			dataType: 'json',
 			beforeSend: function(xhr) {
 				xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
@@ -61,11 +61,41 @@ store.getUsers = () => {
 			   401: function() {
 			     window.open("http://milesfair.com:81/auth/logout","_self")
 			   }
-			 }
+			}
 		});
 	});
 }
 
+/**
+ * get user's profile by id
+ *
+ * @param {string} id
+ * @return {Promise}
+ */
+
+ store.getCustomerById = id => {
+ 	return new Promise((resolve, reject) => {
+ 		$.ajax({
+ 			type: 'GET',
+ 			url: baseUrl + 'user/' + id,
+ 			dataType: 'json',
+ 			beforeSend: function(xhr) {
+				xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+		  	},
+			success: function(data){
+				resolve(data)
+			},
+			fail: function(xhr){
+
+			},
+			statusCode: {
+			   401: function() {
+			     window.open("http://milesfair.com:81/auth/logout","_self")
+			   }
+			}
+ 		})
+ 	})
+ }
 
 /**
  * ban user by id

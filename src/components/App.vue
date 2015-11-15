@@ -69,7 +69,7 @@ export default {
 
 #page-wrapper {
     width: 100%;
-    padding: 0;
+    padding: 10px 50px;
     background-color: #fff;
 }
 
@@ -79,7 +79,7 @@ export default {
     }
 
     #page-wrapper {
-        padding: 10px;
+        padding: 10px 50px;
     }
 }
 

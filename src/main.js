@@ -6,6 +6,7 @@ import Router from 'vue-router'
 import App from './components/App.vue'
 import DashboardView from './components/DashboardView.vue'
 import UserListView from './components/UserListView.vue'
+import UserView from './components/UserView.vue'
 
 // install router
 Vue.use(Router)
@@ -19,6 +20,9 @@ router.map({
   },
   '/users': {
     component: UserListView
+  },
+  '/user/:id': {
+  	component: UserView
   },
 })
 

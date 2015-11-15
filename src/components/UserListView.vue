@@ -13,30 +13,35 @@
 						<thead>
 							<tr>
 								<th>ID</th>
-								<th>Name</th>
 								<th>Email</th>
-								<th>Country</th>
+								<th>Activation Status</th>
+								<th>Ban Status</th>
+								<th>Join Date</th>
 								<th></th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr v-for="entry in data">
 								<td>{{entry['id']}}</td>
-								<td>{{entry['customer']['firstname']}}</td>
 								<td>{{entry['email']}}</td>
-								<td>{{entry['customer']['country']}}</td>
 								<td>
-									<div class="dropdown">
-									  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu{{entry['id']}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-										Action
-										<span class="caret"></span>
-									  </button>
-									  <ul class="dropdown-menu" aria-labelledby="dropdownMenu{{entry['id']}}">
-										<li><a @click="sendResetPasswordLink(entry['id'])" href="javascript:void(0)">Reset Password</a></li>
-										<li><a @click="banUser(entry['id'])" href="javascript:void(0)">Ban User</a></li>
-									  </ul>
-									</div>
+									<span v-if="entry['is_activate'] == 0">
+										Not Activated
+									</span>
+									<span v-else>
+										Activated
+									</span>
 								</td>
+								<td>
+									<span v-if="entry['is_blocked'] == 0">
+										Not Blocked
+									</span>
+									<span v-else>
+										Blocked
+									</span>
+								</td>
+								<td>{{entry['created_at']}}</td>
+								<td><a class="btn btn-primary btn-xs" v-link="{ path: '/user/' + entry['id']}">View</a></td>
 							</tr>
 						</tbody>
 					</table>
@@ -69,10 +74,12 @@ export default {
 		})
 	}
   },  
-  created(){
-	store.getUsers().then(data => {
-		this.data = data.data
-	})
+  route:{
+  	data({to}){
+  		return store.getUsers().then(data=>({
+  			data: data.users
+  		}))
+  	}
   }
 }
 </script>
