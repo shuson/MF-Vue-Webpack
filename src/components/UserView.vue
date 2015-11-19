@@ -41,8 +41,7 @@
                       </tr>
                     </tbody>
                   </table>
-                  <a @click="sendResetPasswordLink(customer.user_id)" href="javascript:void(0)" class="btn btn-primary">Send Reset Password Link</a>
-                  <a @click="banUser(customer.user_id)" href="javascript:void(0)" class="btn btn-primary">Ban This User</a>
+                  <a v-link="{path: '/transactions/' + customer.user_id}" href="javascript:void(0)" class="btn btn-primary">View Transactions</a>
                 </div>
               </div>
             </div>
@@ -63,16 +62,7 @@ export default {
   	}
   },
   methods: {
-  	sendResetPasswordLink: function(id){
-		store.sendResetPasswordLink(id).then(message=>{
-			alert(message);
-		})
-	},
-	banUser: function(id){
-		store.banUser(id).then(message=>{
-			alert(message);
-		})
-	}
+
   },  
   
   route: {

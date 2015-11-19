@@ -7,6 +7,7 @@ import App from './components/App.vue'
 import DashboardView from './components/DashboardView.vue'
 import UserListView from './components/UserListView.vue'
 import UserView from './components/UserView.vue'
+import TransactionListView from './components/TransactionListView.vue'
 
 // install router
 Vue.use(Router)
@@ -24,6 +25,9 @@ router.map({
   '/user/:id': {
   	component: UserView
   },
+  '/transactions/:userId': {
+    component: TransactionListView
+  }
 })
 
 router.beforeEach(function () {

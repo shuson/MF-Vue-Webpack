@@ -8,7 +8,7 @@
 		</div>
 		<div class="row">
 			<div class="col-xs-12">
-				<div class="table-responsive">
+				<div class="table">
 					<table class="table table-hover table-striped">
 						<thead>
 							<tr>
@@ -41,7 +41,22 @@
 									</span>
 								</td>
 								<td>{{entry['created_at']}}</td>
-								<td><a class="btn btn-primary btn-xs" v-link="{ path: '/user/' + entry['id']}">View</a></td>
+								<td>
+									<div class="dropdown">
+									  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu{{entry['id']}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+										Action
+										<span class="caret"></span>
+									  </button>
+									  <ul class="dropdown-menu" aria-labelledby="dropdownMenu{{entry['id']}}">
+									  	<li><a v-link="{ path: '/user/' + entry['id']}">View</a></li>
+										<li><a @click="sendResetPasswordLink(entry['id'])" href="javascript:void(0)">Reset Password</a></li>
+										<li>
+											<a @click="banUser(entry['id'])" href="javascript:void(0)" v-if="entry['is_blocked'] == 0">Ban User</a>
+											<a @click="unBanUser(entry['id'])" href="javascript:void(0)" v-else>Unban User</a>
+										</li>
+									  </ul>
+									</div>
+								</td>
 							</tr>
 						</tbody>
 					</table>
@@ -72,6 +87,9 @@ export default {
 		store.banUser(id).then(message=>{
 			alert(message);
 		})
+	},
+	unBanUser:function(id){
+		alert('unBanUser')
 	}
   },  
   route:{
@@ -86,7 +104,7 @@ export default {
 
 <style>
 #usersView{
-    
+
 }
 
 </style>

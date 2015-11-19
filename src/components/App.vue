@@ -25,6 +25,9 @@
                     <li @click="tabSwitch" :class="{'active': tabName == 'users'}">
                         <a v-link="{ path: '/users'}" name="users"><i class="fa fa-fw fa-users"></i> Users</a>
                     </li>
+                    <li @click="tabSwitch" :class="{'active': tabName == 'transactions'}">
+                        <a v-link="{ path: '/transactions'}" name="transactions"><i class="fa fa-fw fa-exchange"></i> Transactions</a>
+                    </li>
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
@@ -70,6 +73,7 @@ export default {
 #page-wrapper {
     width: 100%;
     padding: 10px 50px;
+    height:100%; 
     background-color: #fff;
 }
 
@@ -80,6 +84,7 @@ export default {
 
     #page-wrapper {
         padding: 10px 50px;
+        min-height: 1024px;
     }
 }
 
