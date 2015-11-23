@@ -41,7 +41,7 @@
                       </tr>
                     </tbody>
                   </table>
-                  <a v-link="{path: '/transactions/' + customer.user_id}" href="javascript:void(0)" class="btn btn-primary">View Transactions</a>
+                  <a v-link="{path: '/user/' + customer.user_id + '/transactions'}" href="javascript:void(0)" class="btn btn-primary">View Transactions</a>
                 </div>
               </div>
             </div>
