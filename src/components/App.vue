@@ -35,10 +35,8 @@
          <!-- main view -->
          <div id="page-wrapper">
          	<router-view
-		      class="view"
 		      keep-alive
-		      transition
-		      transition-mode="out-in">
+			  >
 		    </router-view>
          </div>
 	</div>
@@ -56,7 +54,8 @@ export default {
 	},
 	methods: {
 		tabSwitch: function(event){
-			this.tabName = event.target.name;
+			this.tabName = event.target.name
+			pageObject.tabName = this.tabName
 		},
 	},
 	created () {

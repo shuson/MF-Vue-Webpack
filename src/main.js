@@ -29,6 +29,9 @@ router.map({
 	'/user/:id/transactions': {
 		component: TransactionListView
 	},
+	'/user/:id/transaction/:transId': {
+		component: TransactionView
+	},
 	'/transactions': {
 		component: TransactionListView
 	},

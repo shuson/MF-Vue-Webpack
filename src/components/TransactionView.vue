@@ -1,4 +1,5 @@
 <template>
+	<a href="javascript:window.history.back();"><i class="fa fa-arrow-left"></i> Back</a>
 	<div id="transactionView">
 		Transaction price is: {{trans.price}}
 	</div>
@@ -17,7 +18,7 @@ export default {
 
 	route:{
 	  data({to}){
-		return store.test().then(data=>({
+		return store.getTransactionByIdTest(to.params.transId).then(data=>({
 			trans: data
 		}))
 	  }

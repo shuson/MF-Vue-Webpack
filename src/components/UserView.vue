@@ -1,4 +1,5 @@
 <template>
+	<a href="javascript:window.history.back();"><i class="fa fa-arrow-left"></i> Back</a>
 	<div id="userView" class="container-fluid">
 		<div class="row">
 			<div class="col-xs-12">
