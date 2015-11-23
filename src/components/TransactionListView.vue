@@ -16,7 +16,10 @@ export default {
 
 	route:{
 	  data({to}){
-	  	data: to.params.userId
+	  	//pageObject.tabName = "transactions";
+		return {
+			data: to.params.id
+		}
 	  }
 	 }
 

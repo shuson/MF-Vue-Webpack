@@ -94,7 +94,7 @@ export default {
   },  
   route:{
   	data({to}){
-  		return store.getUsers().then(data=>({
+  		return store.getUsersTest().then(data=>({
   			data: data.users
   		}))
   	}

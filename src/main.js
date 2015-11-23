@@ -16,26 +16,29 @@ Vue.use(Router)
 var router = new Router()
 
 router.map({
-  '/': {
-    component: DashboardView
-  },
-  '/users': {
-    component: UserListView
-  },
-  '/user/:id': {
-  	component: UserView
-  },
-  '/transactions/:userId': {
-    component: TransactionListView
-  }
+	'/': {
+		component: DashboardView
+	},
+	'/users': {
+		component: UserListView
+	},
+	'/user/:id': {
+		component: UserView
+	},
+	'/transactions': {
+		component: TransactionListView
+	},
+	'/transactions/:id': {
+		component: TransactionListView
+	}
 })
 
 router.beforeEach(function () {
-  window.scrollTo(0, 0)
+	window.scrollTo(0, 0)
 })
 
 router.redirect({
-  '*': '/'
+	'*': '/'
 })
 
 router.start(App, '#app')

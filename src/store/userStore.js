@@ -8,35 +8,6 @@ const baseUrl = 'http://milesfair.com:81/api/'
 export default store
 
 /**
- * Test
- *
- * @return {Promise}
- */
-
-store.test = () => {
-    return Promise.resolve([
-		{
-			id: 1,
-			name: "Tommy",
-			age: 22,
-			status: "Active"
-		},
-		{
-			id: 2,
-			name: "Puppy",
-			age: 21,
-			status: "Active"
-		},
-		{
-			id: 3,
-			name: "Sonny",
-			age: 23,
-			status: "Banned"
-		},
-	])
-}
-
-/**
  * get users list
  *
  * @param {string} id
@@ -117,3 +88,59 @@ store.sendResetPasswordLink = id => {
 	return Promise.resolve("Successfully send link to " + id);
 }
 
+/**
+ * getUsersTest
+ *
+ * @return {Promise}
+ */
+
+store.getUsersTest = () => {
+    return Promise.resolve({
+		users: [
+		{
+			id: 1,
+			email: "Tommy",
+			is_blocked: 0,
+			is_activate: 0,
+			created_at: '1992-09-18'
+		},
+		{
+			id: 2,
+			email: "Tommy2",
+			is_blocked: 0,
+			is_activate: 0,
+			created_at: '1992-09-18'
+		},
+		{
+			id: 3,
+			email: "Tommy3",
+			is_blocked: 1,
+			is_activate: 0,
+			created_at: '1992-09-18'
+		},
+	]
+	})
+}
+
+/**
+ * getCustomerByIdTest
+ *
+ * @return {Promise}
+ */
+
+store.getCustomerByIdTest = () => {
+    return Promise.resolve({
+		customer: {
+		id: 1,
+		user_id: 2,
+		firstname: "Tommy",
+		lastname: "Cat",
+		avatar_url: "http://avatar_url",
+		birthday: "1998-09-09",
+		country: "SG",
+		addr_city: "Singapore",
+		languages: "A,B,C",
+		phoneNo: "19293322",
+	}
+	})
+}

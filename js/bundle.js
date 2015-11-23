@@ -220,7 +220,7 @@
 	extend(p, __webpack_require__(73))
 	extend(p, __webpack_require__(74))
 	
-	Vue.version = '1.0.4'
+	Vue.version = '1.0.6'
 	module.exports = _.Vue = Vue
 	
 	/* istanbul ignore if */
@@ -2395,7 +2395,7 @@
 /* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var _ = __webpack_require__(9)
+	/* WEBPACK VAR INJECTION */(function(process) {var _ = __webpack_require__(9)
 	var config = __webpack_require__(13)
 	
 	/**
@@ -2535,6 +2535,15 @@
 	    if (!definition) {
 	      return this.options[type + 's'][id]
 	    } else {
+	      /* istanbul ignore if */
+	      if (process.env.NODE_ENV !== 'production') {
+	        if (type === 'component' && _.commonTagRE.test(id)) {
+	          _.warn(
+	            'Do not use built-in HTML elements as component ' +
+	            'id: ' + id
+	          )
+	        }
+	      }
 	      if (
 	        type === 'component' &&
 	        _.isPlainObject(definition)
@@ -2548,6 +2557,7 @@
 	  }
 	})
 
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
 
 /***/ },
 /* 22 */
@@ -2776,17 +2786,28 @@
 	    }
 	  } else if (process.env.NODE_ENV !== 'production' && containerAttrs) {
 	    // warn container directives for fragment instances
-	    var names = containerAttrs.map(function (attr) {
-	      return '"' + attr.name + '"'
-	    }).join(', ')
-	    var plural = containerAttrs.length > 1
-	    _.warn(
-	      'Attribute' + (plural ? 's ' : ' ') + names +
-	      (plural ? ' are' : ' is') + ' ignored on component ' +
-	      '<' + options.el.tagName.toLowerCase() + '> because ' +
-	      'the component is a fragment instance: ' +
-	      'http://vuejs.org/guide/components.html#Fragment_Instance'
-	    )
+	    var names = containerAttrs
+	      .filter(function (attr) {
+	        // allow vue-loader/vueify scoped css attributes
+	        return attr.name.indexOf('_v-') < 0 &&
+	          // allow event listeners
+	          !onRE.test(attr.name) &&
+	          // allow slots
+	          attr.name !== 'slot'
+	      })
+	      .map(function (attr) {
+	        return '"' + attr.name + '"'
+	      })
+	    if (names.length) {
+	      var plural = names.length > 1
+	      _.warn(
+	        'Attribute' + (plural ? 's ' : ' ') + names.join(', ') +
+	        (plural ? ' are' : ' is') + ' ignored on component ' +
+	        '<' + options.el.tagName.toLowerCase() + '> because ' +
+	        'the component is a fragment instance: ' +
+	        'http://vuejs.org/guide/components.html#Fragment_Instance'
+	      )
+	    }
 	  }
 	
 	  return function rootLinkFn (vm, el, scope) {
@@ -3047,8 +3068,10 @@
 	function checkComponent (el, options) {
 	  var component = _.checkComponent(el, options)
 	  if (component) {
+	    var ref = _.findRef(el)
 	    var descriptor = {
 	      name: 'component',
+	      ref: ref,
 	      expression: component.id,
 	      def: internalDirectives.component,
 	      modifiers: {
@@ -3056,6 +3079,9 @@
 	      }
 	    }
 	    var componentLinkFn = function (vm, el, host, scope, frag) {
+	      if (ref) {
+	        _.defineReactive((scope || vm).$refs, ref, null)
+	      }
 	      vm._bindDir(descriptor, el, host, scope, frag)
 	    }
 	    componentLinkFn.terminal = true
@@ -3122,7 +3148,14 @@
 	    // either an element directive, or if/for
 	    def: def || publicDirectives[dirName]
 	  }
+	  // check ref for v-for
+	  if (dirName === 'for') {
+	    descriptor.ref = _.findRef(el)
+	  }
 	  var fn = function terminalNodeLinkFn (vm, el, host, scope, frag) {
+	    if (descriptor.ref) {
+	      _.defineReactive((scope || vm).$refs, descriptor.ref, null)
+	    }
 	    vm._bindDir(descriptor, el, host, scope, frag)
 	  }
 	  fn.terminal = true
@@ -3157,6 +3190,17 @@
 	      value = textParser.tokensToExp(tokens)
 	      arg = name
 	      pushDir('bind', publicDirectives.bind, true)
+	      // warn against mixing mustaches with v-bind
+	      if (process.env.NODE_ENV !== 'production') {
+	        if (name === 'class' && Array.prototype.some.call(attrs, function (attr) {
+	          return attr.name === ':class' || attr.name === 'v-bind:class'
+	        })) {
+	          _.warn(
+	            'class="' + rawValue + '": Do not mix mustache interpolation ' +
+	            'and v-bind for "class" on the same element. Use one or the other.'
+	          )
+	        }
+	      }
 	    } else
 	
 	    // special attribute: transition
@@ -3204,10 +3248,6 @@
 	      }
 	
 	      if (dirDef) {
-	        if (_.isLiteral(value)) {
-	          value = _.stripQuotes(value)
-	          modifiers.literal = true
-	        }
 	        pushDir(dirName, dirDef)
 	      }
 	    }
@@ -3729,10 +3769,7 @@
 	    this.end = _.createAnchor('v-for-end')
 	    _.replace(this.el, this.end)
 	    _.before(this.start, this.end)
-	
-	    // check ref
-	    this.ref = _.findRef(this.el)
-	
+
 	    // cache
 	    this.cache = Object.create(null)
 	
@@ -3906,7 +3943,7 @@
 	   */
 	
 	  updateRef: function () {
-	    var ref = this.ref
+	    var ref = this.descriptor.ref
 	    if (!ref) return
 	    var hash = (this._scope || this.vm).$refs
 	    var refs
@@ -3918,11 +3955,7 @@
 	        refs[frag.scope.$key] = findVmFromFrag(frag)
 	      })
 	    }
-	    if (!hash.hasOwnProperty(ref)) {
-	      _.defineReactive(hash, ref, refs)
-	    } else {
-	      hash[ref] = refs
-	    }
+	    hash[ref] = refs
 	  },
 	
 	  /**
@@ -4000,11 +4033,11 @@
 	    if (inDoc && staggerAmount) {
 	      var op = frag.staggerCb = _.cancellable(function () {
 	        frag.staggerCb = null
-	        frag.remove(true)
+	        frag.remove()
 	      })
 	      setTimeout(op, staggerAmount)
 	    } else {
-	      frag.remove(true)
+	      frag.remove()
 	    }
 	  },
 	
@@ -4177,19 +4210,16 @@
 	      }
 	      return res
 	    } else {
-	      var type = typeof value
-	      if (type === 'number') {
+	      if (typeof value === 'number') {
 	        value = range(value)
-	      } else if (type === 'string') {
-	        value = _.toArray(value)
 	      }
 	      return value || []
 	    }
 	  },
 	
 	  unbind: function () {
-	    if (this.ref) {
-	      (this._scope || this.vm).$refs[this.ref] = null
+	    if (this.descriptor.ref) {
+	      (this._scope || this.vm).$refs[this.descriptor.ref] = null
 	    }
 	    if (this.frags) {
 	      var i = this.frags.length
@@ -4432,21 +4462,18 @@
 	
 	/**
 	 * Remove fragment, single node version
-	 *
-	 * @param {Boolean} [destroy]
 	 */
 	
-	function singleRemove (destroy) {
+	function singleRemove () {
 	  this.inserted = false
 	  var shouldCallRemove = _.inDoc(this.node)
 	  var self = this
+	  self.callHook(destroyChild)
 	  transition.remove(this.node, this.vm, function () {
 	    if (shouldCallRemove) {
 	      self.callHook(detach)
 	    }
-	    if (destroy) {
-	      self.destroy()
-	    }
+	    self.destroy()
 	  })
 	}
 	
@@ -4473,21 +4500,18 @@
 	
 	/**
 	 * Remove fragment, multi-nodes version
-	 *
-	 * @param {Boolean} [destroy]
 	 */
 	
-	function multiRemove (destroy) {
+	function multiRemove () {
 	  this.inserted = false
 	  var self = this
 	  var shouldCallRemove = _.inDoc(this.node)
+	  self.callHook(destroyChild)
 	  _.removeNodeRange(this.node, this.end, this.vm, this.frag, function () {
 	    if (shouldCallRemove) {
 	      self.callHook(detach)
 	    }
-	    if (destroy) {
-	      self.destroy()
-	    }
+	    self.destroy()
 	  })
 	}
 	
@@ -4503,6 +4527,20 @@
 	  }
 	}
 	
+	/**
+	 * Call destroy for all contained instances,
+	 * with remove:false and defer:true.
+	 * Defer is necessary because we need to
+	 * keep the children to call detach hooks
+	 * on them.
+	 *
+	 * @param {Vue} child
+	 */
+
+	function destroyChild (child) {
+	  child.$destroy(false, true)
+	}
+
 	/**
 	 * Call detach hook for a Vue instance.
 	 *
@@ -4564,7 +4602,7 @@
 	
 	  insert: function () {
 	    if (this.elseFrag) {
-	      this.elseFrag.remove(true)
+	      this.elseFrag.remove()
 	      this.elseFrag = null
 	    }
 	    this.frag = this.factory.create(this._host, this._scope, this._frag)
@@ -4573,10 +4611,10 @@
 	
 	  remove: function () {
 	    if (this.frag) {
-	      this.frag.remove(true)
+	      this.frag.remove()
 	      this.frag = null
 	    }
-	    if (this.elseFactory) {
+	    if (this.elseFactory && !this.elseFrag) {
 	      this.elseFrag = this.elseFactory.create(this._host, this._scope, this._frag)
 	      this.elseFrag.before(this.anchor)
 	    }
@@ -4609,15 +4647,21 @@
 	  },
 	
 	  update: function (value) {
-	    var el = this.el
-	    transition.apply(el, value ? 1 : -1, function () {
+	    this.apply(this.el, value)
+	    if (this.elseEl) {
+	      this.apply(this.elseEl, !value)
+	    }
+	  },
+
+	  apply: function (el, value) {
+	    function done () {
 	      el.style.display = value ? '' : 'none'
-	    }, this.vm)
-	    var elseEl = this.elseEl
-	    if (elseEl) {
-	      transition.apply(elseEl, value ? -1 : 1, function () {
-	        elseEl.style.display = value ? 'none' : ''
-	      }, this.vm)
+	    }
+	    // do not apply transition if not in doc
+	    if (_.inDoc(el)) {
+	      transition.apply(el, value ? 1 : -1, done, this.vm)
+	    } else {
+	      done()
 	    }
 	  }
 	}
@@ -5631,12 +5675,6 @@
 	
 	  bind: function () {
 	    if (!this.el.__vue__) {
-	      // check ref
-	      this.ref = _.findRef(this.el)
-	      var refs = (this._scope || this.vm).$refs
-	      if (this.ref && !refs.hasOwnProperty(this.ref)) {
-	        _.defineReactive(refs, this.ref, null)
-	      }
 	      // keep-alive cache
 	      this.keepAlive = this.params.keepAlive
 	      if (this.keepAlive) {
@@ -5746,6 +5784,10 @@
 	        self.transition(newComponent, cb)
 	      })
 	    } else {
+	      // update ref for kept-alive component
+	      if (cached) {
+	        newComponent._updateRef()
+	      }
 	      this.transition(newComponent, cb)
 	    }
 	  },
@@ -5790,7 +5832,7 @@
 	        // if no inline-template, then the compiled
 	        // linker can be cached for better performance.
 	        _linkerCachable: !this.inlineTemplate,
-	        _ref: this.ref,
+	        _ref: this.descriptor.ref,
 	        _asComponent: true,
 	        _isRouterView: this._isRouterView,
 	        // if this is a transcluded component, context
@@ -5855,6 +5897,10 @@
 	    }
 	    var child = this.childVM
 	    if (!child || this.keepAlive) {
+	      if (child) {
+	        // remove ref
+	        child._updateRef(true)
+	      }
 	      return
 	    }
 	    // the sole purpose of `deferCleanup` is so that we can
@@ -6002,6 +6048,11 @@
 	          childKey,
 	          function (val) {
 	            parentWatcher.set(val)
+	          }, {
+	            // ensure sync upward before parent sync down.
+	            // this is necessary in cases e.g. the child
+	            // mutates a prop array, then replaces it. (#1683)
+	            sync: true
 	          }
 	        )
 	      })
@@ -7191,7 +7242,7 @@
 	
 	module.exports = {
 	
-	  priority: 1000,
+	  priority: 1100,
 	
 	  update: function (id, oldId) {
 	    var el = this.el
@@ -7649,7 +7700,7 @@
 	  var props = []
 	  var names = Object.keys(propOptions)
 	  var i = names.length
-	  var options, name, attr, value, path, parsed, prop, isTitleBinding
+	  var options, name, attr, value, path, parsed, prop
 	  while (i--) {
 	    name = names[i]
 	    options = propOptions[name] || empty
@@ -7675,72 +7726,67 @@
 	      name: name,
 	      path: path,
 	      options: options,
-	      mode: propBindingModes.ONE_WAY
+	      mode: propBindingModes.ONE_WAY,
+	      raw: null
 	    }
-	
-	    // IE title issues
-	    isTitleBinding = false
-	    if (name === 'title' && (el.getAttribute(':title') || el.getAttribute('v-bind:title'))) {
-	      isTitleBinding = true
-	    }
-	
-	    // first check literal version
+
 	    attr = _.hyphenate(name)
-	    value = prop.raw = _.attr(el, attr)
-	    if (value === null || isTitleBinding) {
-	      // then check dynamic version
-	      if ((value = _.getBindAttr(el, attr)) === null) {
-	        if ((value = _.getBindAttr(el, attr + '.sync')) !== null) {
-	          prop.mode = propBindingModes.TWO_WAY
-	        } else if ((value = _.getBindAttr(el, attr + '.once')) !== null) {
-	          prop.mode = propBindingModes.ONE_TIME
-	        }
+	    // first check dynamic version
+	    if ((value = _.getBindAttr(el, attr)) === null) {
+	      if ((value = _.getBindAttr(el, attr + '.sync')) !== null) {
+	        prop.mode = propBindingModes.TWO_WAY
+	      } else if ((value = _.getBindAttr(el, attr + '.once')) !== null) {
+	        prop.mode = propBindingModes.ONE_TIME
 	      }
+	    }
+	    if (value !== null) {
+	      // has dynamic binding!
 	      prop.raw = value
-	      if (value !== null) {
-	        parsed = dirParser.parse(value)
-	        value = parsed.expression
-	        prop.filters = parsed.filters
-	        // check binding type
-	        if (_.isLiteral(value)) {
-	          // for expressions containing literal numbers and
-	          // booleans, there's no need to setup a prop binding,
-	          // so we can optimize them as a one-time set.
-	          prop.optimizedLiteral = true
-	        } else {
-	          prop.dynamic = true
-	          // check non-settable path for two-way bindings
-	          if (process.env.NODE_ENV !== 'production' &&
-	              prop.mode === propBindingModes.TWO_WAY &&
-	              !settablePathRE.test(value)) {
-	            prop.mode = propBindingModes.ONE_WAY
-	            _.warn(
-	              'Cannot bind two-way prop with non-settable ' +
-	              'parent path: ' + value
-	            )
-	          }
-	        }
-	        prop.parentPath = value
-	
-	        // warn required two-way
-	        if (
-	          process.env.NODE_ENV !== 'production' &&
-	          options.twoWay &&
-	          prop.mode !== propBindingModes.TWO_WAY
-	        ) {
+	      parsed = dirParser.parse(value)
+	      value = parsed.expression
+	      prop.filters = parsed.filters
+	      // check binding type
+	      if (_.isLiteral(value)) {
+	        // for expressions containing literal numbers and
+	        // booleans, there's no need to setup a prop binding,
+	        // so we can optimize them as a one-time set.
+	        prop.optimizedLiteral = true
+	      } else {
+	        prop.dynamic = true
+	        // check non-settable path for two-way bindings
+	        if (process.env.NODE_ENV !== 'production' &&
+	            prop.mode === propBindingModes.TWO_WAY &&
+	            !settablePathRE.test(value)) {
+	          prop.mode = propBindingModes.ONE_WAY
 	          _.warn(
-	            'Prop "' + name + '" expects a two-way binding type.'
+	            'Cannot bind two-way prop with non-settable ' +
+	            'parent path: ' + value
 	          )
 	        }
+	      }
+	      prop.parentPath = value
 	
-	      } else if (options.required) {
-	        // warn missing required
-	        process.env.NODE_ENV !== 'production' && _.warn(
-	          'Missing required prop: ' + name
+	      // warn required two-way
+	      if (
+	        process.env.NODE_ENV !== 'production' &&
+	        options.twoWay &&
+	        prop.mode !== propBindingModes.TWO_WAY
+	      ) {
+	        _.warn(
+	          'Prop "' + name + '" expects a two-way binding type.'
 	        )
 	      }
+	    /* eslint-disable no-cond-assign */
+	    } else if (value = _.attr(el, attr)) {
+	    /* eslint-enable no-cond-assign */
+	      // has literal binding!
+	      prop.raw = value
+	    } else if (options.required) {
+	      // warn missing required
+	      process.env.NODE_ENV !== 'production' && _.warn(
+	        'Missing required prop: ' + name
+	      )
 	    }
-	
 	    // push prop
 	    props.push(prop)
 	  }
@@ -7793,8 +7839,10 @@
 	        }
 	      } else if (prop.optimizedLiteral) {
 	        // optimized literal, cast it and just set once
-	        raw = _.stripQuotes(raw)
-	        value = _.toBoolean(_.toNumber(raw))
+	        var stripped = _.stripQuotes(raw)
+	        value = stripped === raw
+	          ? _.toBoolean(_.toNumber(raw))
+	          : stripped
 	        _.initProp(vm, prop, value)
 	      } else {
 	        // string literal, but we need to cater for
@@ -8320,23 +8368,25 @@
 	 * Limit filter for arrays
 	 *
 	 * @param {Number} n
+	 * @param {Number} offset (Decimal expected)
 	 */
 	
-	exports.limitBy = function (arr, n) {
+	exports.limitBy = function (arr, n, offset) {
+	  offset = offset ? parseInt(offset, 10) : 0
 	  return typeof n === 'number'
-	    ? arr.slice(0, n)
+	    ? arr.slice(offset, offset + n)
 	    : arr
 	}
 	
 	/**
 	 * Filter filter for arrays
 	 *
-	 * @param {String} searchKey
+	 * @param {String} search
 	 * @param {String} [delimiter]
-	 * @param {String} dataKey
+	 * @param {String} ...dataKeys
 	 */
 	
-	exports.filterBy = function (arr, search, delimiter /* ...dataKeys */) {
+	exports.filterBy = function (arr, search, delimiter) {
 	  arr = toArray(arr)
 	  if (search == null) {
 	    return arr
@@ -8514,12 +8564,7 @@
 	  if (this.$parent) {
 	    this.$parent.$children.push(this)
 	  }
-	
-	  // set ref
-	  if (options._ref) {
-	    (this._scope || this._context).$refs[options._ref] = this
-	  }
-	
+
 	  // merge options.
 	  options = this.$options = mergeOptions(
 	    this.constructor.options,
@@ -8527,6 +8572,9 @@
 	    this
 	  )
 	
+	  // set ref
+	  this._updateRef()
+
 	  // initialize data as empty object.
 	  // it will be filled up in _initScope().
 	  this._data = {}
@@ -9285,6 +9333,26 @@
 	var compiler = __webpack_require__(22)
 	
 	/**
+	 * Update v-ref for component.
+	 *
+	 * @param {Boolean} remove
+	 */
+
+	exports._updateRef = function (remove) {
+	  var ref = this.$options._ref
+	  if (ref) {
+	    var refs = (this._scope || this._context).$refs
+	    if (remove) {
+	      if (refs[ref] === this) {
+	        refs[ref] = null
+	      }
+	    } else {
+	      refs[ref] = this
+	    }
+	  }
+	}
+
+	/**
 	 * Transclude, compile and link element.
 	 *
 	 * If a pre-compiled linker is available, that means the
@@ -9405,6 +9473,9 @@
 	
 	exports._destroy = function (remove, deferCleanup) {
 	  if (this._isBeingDestroyed) {
+	    if (!deferCleanup) {
+	      this._cleanup()
+	    }
 	    return
 	  }
 	  this._callHook('beforeDestroy')
@@ -9415,18 +9486,8 @@
 	  var parent = this.$parent
 	  if (parent && !parent._isBeingDestroyed) {
 	    parent.$children.$remove(this)
-	    // unregister ref
-	    var ref = this.$options._ref
-	    if (ref) {
-	      var scope = this._scope || this._context
-	      if (scope.$refs[ref] === this) {
-	        scope.$refs[ref] = null
-	      }
-	    }
-	  }
-	  // remove self from owner fragment
-	  if (this._frag) {
-	    this._frag.children.$remove(this)
+	    // unregister ref (remove: true)
+	    this._updateRef(true)
 	  }
 	  // destroy all children.
 	  i = this.$children.length
@@ -9468,6 +9529,15 @@
 	 */
 	
 	exports._cleanup = function () {
+	  if (this._isDestroyed) {
+	    return
+	  }
+	  // remove self from owner fragment
+	  // do it in cleanup so that we can call $destroy with
+	  // defer right when a fragment is about to be removed.
+	  if (this._frag) {
+	    this._frag.children.$remove(this)
+	  }
 	  // remove reference from data ob
 	  // frozen object may not have observer.
 	  if (this._data.__ob__) {
@@ -13544,7 +13614,7 @@
 	
 	
 	// module
-	exports.push([module.id, "#wrapper {\n    padding-left: 0;\n}\n\n#page-wrapper {\n    width: 100%;\n    padding: 10px 50px;\n    height:100%; \n    background-color: #fff;\n}\n\n@media(min-width:768px) {\n    #wrapper {\n        padding-left: 225px;\n    }\n\n    #page-wrapper {\n        padding: 10px 50px;\n        min-height: 1024px;\n    }\n}\n\n/* Top Navigation */\n\n.top-nav {\n    padding: 0 15px;\n}\n\n.top-nav>li {\n    display: inline-block;\n    float: left;\n}\n\n.top-nav>li>a {\n    padding-top: 15px;\n    padding-bottom: 15px;\n    line-height: 20px;\n    color: #999;\n}\n\n.top-nav>li>a:hover,\n.top-nav>li>a:focus,\n.top-nav>.open>a,\n.top-nav>.open>a:hover,\n.top-nav>.open>a:focus {\n    color: #fff;\n    background-color: #000;\n}\n\n.top-nav>.open>.dropdown-menu {\n    float: left;\n    position: absolute;\n    margin-top: 0;\n    border: 1px solid rgba(0,0,0,.15);\n    border-top-left-radius: 0;\n    border-top-right-radius: 0;\n    background-color: #fff;\n    box-shadow: 0 6px 12px rgba(0,0,0,.175);\n}\n\n.top-nav>.open>.dropdown-menu>li>a {\n    white-space: normal;\n}\n\nul.message-dropdown {\n    padding: 0;\n    max-height: 250px;\n    overflow-x: hidden;\n    overflow-y: auto;\n}\n\nli.message-preview {\n    width: 275px;\n    border-bottom: 1px solid rgba(0,0,0,.15);\n}\n\nli.message-preview>a {\n    padding-top: 15px;\n    padding-bottom: 15px;\n}\n\nli.message-footer {\n    margin: 5px 0;\n}\n\nul.alert-dropdown {\n    width: 200px;\n}\n\n/* Side Navigation */\n\n@media(min-width:768px) {\n    .side-nav {\n        position: fixed;\n        top: 51px;\n        left: 225px;\n        width: 225px;\n        margin-left: -225px;\n        border: none;\n        border-radius: 0;\n        overflow-y: auto;\n        background-color: #222;\n        bottom: 0;\n        overflow-x: hidden;\n        padding-bottom: 40px;\n    }\n\n    .side-nav>li>a {\n        width: 225px;\n    }\n\n    .side-nav li a:hover,\n    .side-nav li a:focus {\n        outline: none;\n        background-color: #000 !important;\n    }\n}\n\n.side-nav>li>ul {\n    padding: 0;\n}\n\n.side-nav>li>ul>li>a {\n    display: block;\n    padding: 10px 15px 10px 38px;\n    text-decoration: none;\n    color: #999;\n}\n\n.side-nav>li>ul>li>a:hover {\n    color: #fff;\n}", ""]);
+	exports.push([module.id, "#wrapper {\r\n    padding-left: 0;\r\n}\r\n\r\n#page-wrapper {\r\n    width: 100%;\r\n    padding: 10px 50px;\r\n    height:100%; \r\n    background-color: #fff;\r\n}\r\n\r\n@media(min-width:768px) {\r\n    #wrapper {\r\n        padding-left: 225px;\r\n    }\r\n\r\n    #page-wrapper {\r\n        padding: 10px 50px;\r\n        min-height: 1024px;\r\n    }\r\n}\r\n\r\n/* Top Navigation */\r\n\r\n.top-nav {\r\n    padding: 0 15px;\r\n}\r\n\r\n.top-nav>li {\r\n    display: inline-block;\r\n    float: left;\r\n}\r\n\r\n.top-nav>li>a {\r\n    padding-top: 15px;\r\n    padding-bottom: 15px;\r\n    line-height: 20px;\r\n    color: #999;\r\n}\r\n\r\n.top-nav>li>a:hover,\r\n.top-nav>li>a:focus,\r\n.top-nav>.open>a,\r\n.top-nav>.open>a:hover,\r\n.top-nav>.open>a:focus {\r\n    color: #fff;\r\n    background-color: #000;\r\n}\r\n\r\n.top-nav>.open>.dropdown-menu {\r\n    float: left;\r\n    position: absolute;\r\n    margin-top: 0;\r\n    border: 1px solid rgba(0,0,0,.15);\r\n    border-top-left-radius: 0;\r\n    border-top-right-radius: 0;\r\n    background-color: #fff;\r\n    box-shadow: 0 6px 12px rgba(0,0,0,.175);\r\n}\r\n\r\n.top-nav>.open>.dropdown-menu>li>a {\r\n    white-space: normal;\r\n}\r\n\r\nul.message-dropdown {\r\n    padding: 0;\r\n    max-height: 250px;\r\n    overflow-x: hidden;\r\n    overflow-y: auto;\r\n}\r\n\r\nli.message-preview {\r\n    width: 275px;\r\n    border-bottom: 1px solid rgba(0,0,0,.15);\r\n}\r\n\r\nli.message-preview>a {\r\n    padding-top: 15px;\r\n    padding-bottom: 15px;\r\n}\r\n\r\nli.message-footer {\r\n    margin: 5px 0;\r\n}\r\n\r\nul.alert-dropdown {\r\n    width: 200px;\r\n}\r\n\r\n/* Side Navigation */\r\n\r\n@media(min-width:768px) {\r\n    .side-nav {\r\n        position: fixed;\r\n        top: 51px;\r\n        left: 225px;\r\n        width: 225px;\r\n        margin-left: -225px;\r\n        border: none;\r\n        border-radius: 0;\r\n        overflow-y: auto;\r\n        background-color: #222;\r\n        bottom: 0;\r\n        overflow-x: hidden;\r\n        padding-bottom: 40px;\r\n    }\r\n\r\n    .side-nav>li>a {\r\n        width: 225px;\r\n    }\r\n\r\n    .side-nav li a:hover,\r\n    .side-nav li a:focus {\r\n        outline: none;\r\n        background-color: #000 !important;\r\n    }\r\n}\r\n\r\n.side-nav>li>ul {\r\n    padding: 0;\r\n}\r\n\r\n.side-nav>li>ul>li>a {\r\n    display: block;\r\n    padding: 10px 15px 10px 38px;\r\n    text-decoration: none;\r\n    color: #999;\r\n}\r\n\r\n.side-nav>li>ul>li>a:hover {\r\n    color: #fff;\r\n}", ""]);
 	
 	// exports
 
@@ -13890,7 +13960,7 @@
 /* 113 */
 /***/ function(module, exports) {
 
-	module.exports = "<div id=\"wrapper\">\n\t\t<nav class=\"navbar navbar-inverse navbar-fixed-top\" role=\"navigation\">\n            <!-- Brand and toggle get grouped for better mobile display -->\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\" href=\"#/\">Admin Panel</a>\n            </div>\n            <!-- Top Menu Items -->\n            <ul class=\"nav navbar-right top-nav\">\n                <li class=\"dropdown\">\n                    <a href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\"><i class=\"fa fa-user\"></i> {{user.name}} <b class=\"caret\"></b></a>\n                    <ul class=\"dropdown-menu\"> \n                        <li>\n                            <a href=\"/auth/logout\"><i class=\"fa fa-fw fa-power-off\"></i> Log Out</a>\n                        </li>\n                    </ul>\n                </li>\n            </ul>\n            <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->\n            <div class=\"collapse navbar-collapse navbar-ex1-collapse\">\n                <ul class=\"nav navbar-nav side-nav\">\n                    <li @click=\"tabSwitch\" :class=\"{'active': tabName == 'dashboard'}\">\n                        <a v-link=\"{ path: '/'}\" name=\"dashboard\"><i class=\"fa fa-fw fa-dashboard\"></i> Dashboard</a>\n                    </li>\n                    <li @click=\"tabSwitch\" :class=\"{'active': tabName == 'users'}\">\n                        <a v-link=\"{ path: '/users'}\" name=\"users\"><i class=\"fa fa-fw fa-users\"></i> Users</a>\n                    </li>\n                    <li @click=\"tabSwitch\" :class=\"{'active': tabName == 'transactions'}\">\n                        <a v-link=\"{ path: '/transactions'}\" name=\"transactions\"><i class=\"fa fa-fw fa-exchange\"></i> Transactions</a>\n                    </li>\n                </ul>\n            </div>\n            <!-- /.navbar-collapse -->\n        </nav>\n         <!-- main view -->\n         <div id=\"page-wrapper\">\n         \t<router-view\n\t\t      class=\"view\"\n\t\t      keep-alive\n\t\t      transition\n\t\t      transition-mode=\"out-in\">\n\t\t    </router-view>\n         </div>\n\t</div>";
+	module.exports = "<div id=\"wrapper\">\r\n\t\t<nav class=\"navbar navbar-inverse navbar-fixed-top\" role=\"navigation\">\r\n            <!-- Brand and toggle get grouped for better mobile display -->\r\n            <div class=\"navbar-header\">\r\n                <a class=\"navbar-brand\" href=\"#/\">Admin Panel</a>\r\n            </div>\r\n            <!-- Top Menu Items -->\r\n            <ul class=\"nav navbar-right top-nav\">\r\n                <li class=\"dropdown\">\r\n                    <a href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\"><i class=\"fa fa-user\"></i> {{user.name}} <b class=\"caret\"></b></a>\r\n                    <ul class=\"dropdown-menu\"> \r\n                        <li>\r\n                            <a href=\"/auth/logout\"><i class=\"fa fa-fw fa-power-off\"></i> Log Out</a>\r\n                        </li>\r\n                    </ul>\r\n                </li>\r\n            </ul>\r\n            <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->\r\n            <div class=\"collapse navbar-collapse navbar-ex1-collapse\">\r\n                <ul class=\"nav navbar-nav side-nav\">\r\n                    <li @click=\"tabSwitch\" :class=\"{'active': tabName == 'dashboard'}\">\r\n                        <a v-link=\"{ path: '/'}\" name=\"dashboard\"><i class=\"fa fa-fw fa-dashboard\"></i> Dashboard</a>\r\n                    </li>\r\n                    <li @click=\"tabSwitch\" :class=\"{'active': tabName == 'users'}\">\r\n                        <a v-link=\"{ path: '/users'}\" name=\"users\"><i class=\"fa fa-fw fa-users\"></i> Users</a>\r\n                    </li>\r\n                    <li @click=\"tabSwitch\" :class=\"{'active': tabName == 'transactions'}\">\r\n                        <a v-link=\"{ path: '/transactions'}\" name=\"transactions\"><i class=\"fa fa-fw fa-exchange\"></i> Transactions</a>\r\n                    </li>\r\n                </ul>\r\n            </div>\r\n            <!-- /.navbar-collapse -->\r\n        </nav>\r\n         <!-- main view -->\r\n         <div id=\"page-wrapper\">\r\n         \t<router-view\r\n\t\t      class=\"view\"\r\n\t\t      keep-alive\r\n\t\t      transition\r\n\t\t      transition-mode=\"out-in\">\r\n\t\t    </router-view>\r\n         </div>\r\n\t</div>";
 
 /***/ },
 /* 114 */
@@ -13949,7 +14019,7 @@
 	
 	
 	// module
-	exports.push([module.id, "#dashbaordView{\n    \n}\n\n.panel-green {\n    border-color: #5cb85c;\n}\n\n.panel-green > .panel-heading {\n    border-color: #5cb85c;\n    color: #fff;\n    background-color: #5cb85c;\n}\n\n.panel-green > a {\n    color: #5cb85c;\n}\n\n.panel-green > a:hover {\n    color: #3d8b3d;\n}\n\n.panel-red {\n    border-color: #d9534f;\n}\n\n.panel-red > .panel-heading {\n    border-color: #d9534f;\n    color: #fff;\n    background-color: #d9534f;\n}\n\n.panel-red > a {\n    color: #d9534f;\n}\n\n.panel-red > a:hover {\n    color: #b52b27;\n}\n\n.panel-yellow {\n    border-color: #f0ad4e;\n}\n\n.panel-yellow > .panel-heading {\n    border-color: #f0ad4e;\n    color: #fff;\n    background-color: #f0ad4e;\n}\n\n.panel-yellow > a {\n    color: #f0ad4e;\n}\n\n.panel-yellow > a:hover {\n    color: #df8a13;\n}", ""]);
+	exports.push([module.id, "#dashbaordView{\r\n    \r\n}\r\n\r\n.panel-green {\r\n    border-color: #5cb85c;\r\n}\r\n\r\n.panel-green > .panel-heading {\r\n    border-color: #5cb85c;\r\n    color: #fff;\r\n    background-color: #5cb85c;\r\n}\r\n\r\n.panel-green > a {\r\n    color: #5cb85c;\r\n}\r\n\r\n.panel-green > a:hover {\r\n    color: #3d8b3d;\r\n}\r\n\r\n.panel-red {\r\n    border-color: #d9534f;\r\n}\r\n\r\n.panel-red > .panel-heading {\r\n    border-color: #d9534f;\r\n    color: #fff;\r\n    background-color: #d9534f;\r\n}\r\n\r\n.panel-red > a {\r\n    color: #d9534f;\r\n}\r\n\r\n.panel-red > a:hover {\r\n    color: #b52b27;\r\n}\r\n\r\n.panel-yellow {\r\n    border-color: #f0ad4e;\r\n}\r\n\r\n.panel-yellow > .panel-heading {\r\n    border-color: #f0ad4e;\r\n    color: #fff;\r\n    background-color: #f0ad4e;\r\n}\r\n\r\n.panel-yellow > a {\r\n    color: #f0ad4e;\r\n}\r\n\r\n.panel-yellow > a:hover {\r\n    color: #df8a13;\r\n}", ""]);
 	
 	// exports
 
@@ -15301,7 +15371,7 @@
 /* 122 */
 /***/ function(module, exports) {
 
-	module.exports = "<div id=\"dashbaordView\" class=\"container-fluid\">\n\t\t{{message}}\n\t</div>\n\t <div class=\"row\">\n        <div class=\"col-lg-4 col-md-6\">\n            <div class=\"panel panel-primary\">\n                <div class=\"panel-heading\">\n                    <div class=\"row\">\n                        <div class=\"col-xs-3\">\n                            <i class=\"fa fa-comments fa-5x\"></i>\n                        </div>\n                        <div class=\"col-xs-9 text-right\">\n                            <div class=\"huge\">26</div>\n                            <div>New Comments!</div>\n                        </div>\n                    </div>\n                </div>\n                <a href=\"#\">\n                    <div class=\"panel-footer\">\n                        <span class=\"pull-left\">View Details</span>\n                        <span class=\"pull-right\"><i class=\"fa fa-arrow-circle-right\"></i></span>\n                        <div class=\"clearfix\"></div>\n                    </div>\n                </a>\n            </div>\n        </div>\n        <div class=\"col-lg-4 col-md-6\">\n            <div class=\"panel panel-green\">\n                <div class=\"panel-heading\">\n                    <div class=\"row\">\n                        <div class=\"col-xs-3\">\n                            <i class=\"fa fa-tasks fa-5x\"></i>\n                        </div>\n                        <div class=\"col-xs-9 text-right\">\n                            <div class=\"huge\">12</div>\n                            <div>New Tasks!</div>\n                        </div>\n                    </div>\n                </div>\n                <a href=\"#\">\n                    <div class=\"panel-footer\">\n                        <span class=\"pull-left\">View Details</span>\n                        <span class=\"pull-right\"><i class=\"fa fa-arrow-circle-right\"></i></span>\n                        <div class=\"clearfix\"></div>\n                    </div>\n                </a>\n            </div>\n        </div>\n        <div class=\"col-lg-4 col-md-6\">\n            <div class=\"panel panel-yellow\">\n                <div class=\"panel-heading\">\n                    <div class=\"row\">\n                        <div class=\"col-xs-3\">\n                            <i class=\"fa fa-shopping-cart fa-5x\"></i>\n                        </div>\n                        <div class=\"col-xs-9 text-right\">\n                            <div class=\"huge\">124</div>\n                            <div>New Orders!</div>\n                        </div>\n                    </div>\n                </div>\n                <a href=\"#\">\n                    <div class=\"panel-footer\">\n                        <span class=\"pull-left\">View Details</span>\n                        <span class=\"pull-right\"><i class=\"fa fa-arrow-circle-right\"></i></span>\n                        <div class=\"clearfix\"></div>\n                    </div>\n                </a>\n            </div>\n        </div>\n    </div>";
+	module.exports = "<div id=\"dashbaordView\" class=\"container-fluid\">\r\n\t\t{{message}}\r\n\t</div>\r\n\t <div class=\"row\">\r\n        <div class=\"col-lg-4 col-md-6\">\r\n            <div class=\"panel panel-primary\">\r\n                <div class=\"panel-heading\">\r\n                    <div class=\"row\">\r\n                        <div class=\"col-xs-3\">\r\n                            <i class=\"fa fa-comments fa-5x\"></i>\r\n                        </div>\r\n                        <div class=\"col-xs-9 text-right\">\r\n                            <div class=\"huge\">26</div>\r\n                            <div>New Comments!</div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <a href=\"#\">\r\n                    <div class=\"panel-footer\">\r\n                        <span class=\"pull-left\">View Details</span>\r\n                        <span class=\"pull-right\"><i class=\"fa fa-arrow-circle-right\"></i></span>\r\n                        <div class=\"clearfix\"></div>\r\n                    </div>\r\n                </a>\r\n            </div>\r\n        </div>\r\n        <div class=\"col-lg-4 col-md-6\">\r\n            <div class=\"panel panel-green\">\r\n                <div class=\"panel-heading\">\r\n                    <div class=\"row\">\r\n                        <div class=\"col-xs-3\">\r\n                            <i class=\"fa fa-tasks fa-5x\"></i>\r\n                        </div>\r\n                        <div class=\"col-xs-9 text-right\">\r\n                            <div class=\"huge\">12</div>\r\n                            <div>New Tasks!</div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <a href=\"#\">\r\n                    <div class=\"panel-footer\">\r\n                        <span class=\"pull-left\">View Details</span>\r\n                        <span class=\"pull-right\"><i class=\"fa fa-arrow-circle-right\"></i></span>\r\n                        <div class=\"clearfix\"></div>\r\n                    </div>\r\n                </a>\r\n            </div>\r\n        </div>\r\n        <div class=\"col-lg-4 col-md-6\">\r\n            <div class=\"panel panel-yellow\">\r\n                <div class=\"panel-heading\">\r\n                    <div class=\"row\">\r\n                        <div class=\"col-xs-3\">\r\n                            <i class=\"fa fa-shopping-cart fa-5x\"></i>\r\n                        </div>\r\n                        <div class=\"col-xs-9 text-right\">\r\n                            <div class=\"huge\">124</div>\r\n                            <div>New Orders!</div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <a href=\"#\">\r\n                    <div class=\"panel-footer\">\r\n                        <span class=\"pull-left\">View Details</span>\r\n                        <span class=\"pull-right\"><i class=\"fa fa-arrow-circle-right\"></i></span>\r\n                        <div class=\"clearfix\"></div>\r\n                    </div>\r\n                </a>\r\n            </div>\r\n        </div>\r\n    </div>";
 
 /***/ },
 /* 123 */
@@ -15360,7 +15430,7 @@
 	
 	
 	// module
-	exports.push([module.id, "#usersView{\n\n}", ""]);
+	exports.push([module.id, "#usersView{\r\n\r\n}", ""]);
 	
 	// exports
 
@@ -15541,7 +15611,7 @@
 /* 128 */
 /***/ function(module, exports) {
 
-	module.exports = "<div id=\"usersView\" class=\"container-fluid\">\n\t\t<div class=\"row\">\n\t\t\t<div class=\"col-xs-12\">\n\t\t\t\t<h1 class=\"page-header\">User List</h1>\n\t\t\t\t<input type=\"text\" placeholder=\"Search User by Name\" />\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"row\">\n\t\t\t<div class=\"col-xs-12\">\n\t\t\t\t<div class=\"table\">\n\t\t\t\t\t<table class=\"table table-hover table-striped\">\n\t\t\t\t\t\t<thead>\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t<th>ID</th>\n\t\t\t\t\t\t\t\t<th>Email</th>\n\t\t\t\t\t\t\t\t<th>Activation Status</th>\n\t\t\t\t\t\t\t\t<th>Ban Status</th>\n\t\t\t\t\t\t\t\t<th>Join Date</th>\n\t\t\t\t\t\t\t\t<th></th>\n\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t</thead>\n\t\t\t\t\t\t<tbody>\n\t\t\t\t\t\t\t<tr v-for=\"entry in data\">\n\t\t\t\t\t\t\t\t<td>{{entry['id']}}</td>\n\t\t\t\t\t\t\t\t<td>{{entry['email']}}</td>\n\t\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t\t<span v-if=\"entry['is_activate'] == 0\">\n\t\t\t\t\t\t\t\t\t\tNot Activated\n\t\t\t\t\t\t\t\t\t</span>\n\t\t\t\t\t\t\t\t\t<span v-else>\n\t\t\t\t\t\t\t\t\t\tActivated\n\t\t\t\t\t\t\t\t\t</span>\n\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t\t<span v-if=\"entry['is_blocked'] == 0\">\n\t\t\t\t\t\t\t\t\t\tNot Blocked\n\t\t\t\t\t\t\t\t\t</span>\n\t\t\t\t\t\t\t\t\t<span v-else>\n\t\t\t\t\t\t\t\t\t\tBlocked\n\t\t\t\t\t\t\t\t\t</span>\n\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t<td>{{entry['created_at']}}</td>\n\t\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t\t<div class=\"dropdown\">\n\t\t\t\t\t\t\t\t\t  <button class=\"btn btn-default dropdown-toggle\" type=\"button\" id=\"dropdownMenu{{entry['id']}}\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">\n\t\t\t\t\t\t\t\t\t\tAction\n\t\t\t\t\t\t\t\t\t\t<span class=\"caret\"></span>\n\t\t\t\t\t\t\t\t\t  </button>\n\t\t\t\t\t\t\t\t\t  <ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu{{entry['id']}}\">\n\t\t\t\t\t\t\t\t\t  \t<li><a v-link=\"{ path: '/user/' + entry['id']}\">View</a></li>\n\t\t\t\t\t\t\t\t\t\t<li><a @click=\"sendResetPasswordLink(entry['id'])\" href=\"javascript:void(0)\">Reset Password</a></li>\n\t\t\t\t\t\t\t\t\t\t<li>\n\t\t\t\t\t\t\t\t\t\t\t<a @click=\"banUser(entry['id'])\" href=\"javascript:void(0)\" v-if=\"entry['is_blocked'] == 0\">Ban User</a>\n\t\t\t\t\t\t\t\t\t\t\t<a @click=\"unBanUser(entry['id'])\" href=\"javascript:void(0)\" v-else>Unban User</a>\n\t\t\t\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\t\t  </ul>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t</tbody>\n\t\t\t\t\t</table>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>";
+	module.exports = "<div id=\"usersView\" class=\"container-fluid\">\r\n\t\t<div class=\"row\">\r\n\t\t\t<div class=\"col-xs-12\">\r\n\t\t\t\t<h1 class=\"page-header\">User List</h1>\r\n\t\t\t\t<input type=\"text\" placeholder=\"Search User by Name\" />\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t<div class=\"row\">\r\n\t\t\t<div class=\"col-xs-12\">\r\n\t\t\t\t<div class=\"table\">\r\n\t\t\t\t\t<table class=\"table table-hover table-striped\">\r\n\t\t\t\t\t\t<thead>\r\n\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t<th>ID</th>\r\n\t\t\t\t\t\t\t\t<th>Email</th>\r\n\t\t\t\t\t\t\t\t<th>Activation Status</th>\r\n\t\t\t\t\t\t\t\t<th>Ban Status</th>\r\n\t\t\t\t\t\t\t\t<th>Join Date</th>\r\n\t\t\t\t\t\t\t\t<th></th>\r\n\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t</thead>\r\n\t\t\t\t\t\t<tbody>\r\n\t\t\t\t\t\t\t<tr v-for=\"entry in data\">\r\n\t\t\t\t\t\t\t\t<td>{{entry['id']}}</td>\r\n\t\t\t\t\t\t\t\t<td>{{entry['email']}}</td>\r\n\t\t\t\t\t\t\t\t<td>\r\n\t\t\t\t\t\t\t\t\t<span v-if=\"entry['is_activate'] == 0\">\r\n\t\t\t\t\t\t\t\t\t\tNot Activated\r\n\t\t\t\t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t\t\t\t<span v-else>\r\n\t\t\t\t\t\t\t\t\t\tActivated\r\n\t\t\t\t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t\t\t</td>\r\n\t\t\t\t\t\t\t\t<td>\r\n\t\t\t\t\t\t\t\t\t<span v-if=\"entry['is_blocked'] == 0\">\r\n\t\t\t\t\t\t\t\t\t\tNot Blocked\r\n\t\t\t\t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t\t\t\t<span v-else>\r\n\t\t\t\t\t\t\t\t\t\tBlocked\r\n\t\t\t\t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t\t\t</td>\r\n\t\t\t\t\t\t\t\t<td>{{entry['created_at']}}</td>\r\n\t\t\t\t\t\t\t\t<td>\r\n\t\t\t\t\t\t\t\t\t<div class=\"dropdown\">\r\n\t\t\t\t\t\t\t\t\t  <button class=\"btn btn-default dropdown-toggle\" type=\"button\" id=\"dropdownMenu{{entry['id']}}\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">\r\n\t\t\t\t\t\t\t\t\t\tAction\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"caret\"></span>\r\n\t\t\t\t\t\t\t\t\t  </button>\r\n\t\t\t\t\t\t\t\t\t  <ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu{{entry['id']}}\">\r\n\t\t\t\t\t\t\t\t\t  \t<li><a v-link=\"{ path: '/user/' + entry['id']}\">View</a></li>\r\n\t\t\t\t\t\t\t\t\t\t<li><a @click=\"sendResetPasswordLink(entry['id'])\" href=\"javascript:void(0)\">Reset Password</a></li>\r\n\t\t\t\t\t\t\t\t\t\t<li>\r\n\t\t\t\t\t\t\t\t\t\t\t<a @click=\"banUser(entry['id'])\" href=\"javascript:void(0)\" v-if=\"entry['is_blocked'] == 0\">Ban User</a>\r\n\t\t\t\t\t\t\t\t\t\t\t<a @click=\"unBanUser(entry['id'])\" href=\"javascript:void(0)\" v-else>Unban User</a>\r\n\t\t\t\t\t\t\t\t\t\t</li>\r\n\t\t\t\t\t\t\t\t\t  </ul>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</td>\r\n\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t</tbody>\r\n\t\t\t\t\t</table>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>";
 
 /***/ },
 /* 129 */
@@ -15600,7 +15670,7 @@
 	
 	
 	// module
-	exports.push([module.id, "#userView{\n    \n}", ""]);
+	exports.push([module.id, "#userView{\r\n    \r\n}", ""]);
 	
 	// exports
 
@@ -15647,7 +15717,7 @@
 /* 133 */
 /***/ function(module, exports) {
 
-	module.exports = "<div id=\"userView\" class=\"container-fluid\">\n\t\t<div class=\"row\">\n\t\t\t<div class=\"col-xs-12\">\n\t\t\t\t<h1 class=\"page-header\">User Details</h1>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"row\">\n\t\t\t<div class=\"col-xs-12\">\n\t\t\t\t <div class=\"panel panel-info\">\n            <div class=\"panel-heading\">\n              <h3 class=\"panel-title\">{{customer.firstname}} {{customer.lastname}}</h3>\n            </div>\n            <div class=\"panel-body\">\n              <div class=\"row\">\n                <div class=\"col-md-3 col-lg-3 \" align=\"center\"> \n                \t<img alt=\"\" :src=\"customer.avatar_url\" class=\"img-circle img-responsive\" />\n                </div>\n                <div class=\" col-md-9 col-lg-9 \"> \n                  <table class=\"table table-user-information\">\n                    <tbody>\n                       <tr>\n                        <td>Birthday:</td>\n                        <td>{{customer.birthday}}</td>\n                      </tr>\n                      <tr>\n                        <td>Country:</td>\n                        <td>{{customer.country}}</td>\n                      </tr>\n                      <tr>\n                        <td>City:</td>\n                        <td>{{customer.addr_city}}</td>\n                      </tr>\n                      <tr>\n                        <td>Languages:</td>\n                        <td>{{customer.languages}}</td>\n                      </tr>\n                      <tr>\n                        <td>Phone No.:</td>\n                        <td>{{customer.phoneNo}}</td>\n                      </tr>\n                    </tbody>\n                  </table>\n                  <a v-link=\"{path: '/transactions/' + customer.user_id}\" href=\"javascript:void(0)\" class=\"btn btn-primary\">View Transactions</a>\n                </div>\n              </div>\n            </div>\n          </div>\n        </div>\n\t</div>\n</template>";
+	module.exports = "<div id=\"userView\" class=\"container-fluid\">\r\n\t\t<div class=\"row\">\r\n\t\t\t<div class=\"col-xs-12\">\r\n\t\t\t\t<h1 class=\"page-header\">User Details</h1>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t<div class=\"row\">\r\n\t\t\t<div class=\"col-xs-12\">\r\n\t\t\t\t <div class=\"panel panel-info\">\r\n            <div class=\"panel-heading\">\r\n              <h3 class=\"panel-title\">{{customer.firstname}} {{customer.lastname}}</h3>\r\n            </div>\r\n            <div class=\"panel-body\">\r\n              <div class=\"row\">\r\n                <div class=\"col-md-3 col-lg-3 \" align=\"center\"> \r\n                \t<img alt=\"\" :src=\"customer.avatar_url\" class=\"img-circle img-responsive\" />\r\n                </div>\r\n                <div class=\" col-md-9 col-lg-9 \"> \r\n                  <table class=\"table table-user-information\">\r\n                    <tbody>\r\n                       <tr>\r\n                        <td>Birthday:</td>\r\n                        <td>{{customer.birthday}}</td>\r\n                      </tr>\r\n                      <tr>\r\n                        <td>Country:</td>\r\n                        <td>{{customer.country}}</td>\r\n                      </tr>\r\n                      <tr>\r\n                        <td>City:</td>\r\n                        <td>{{customer.addr_city}}</td>\r\n                      </tr>\r\n                      <tr>\r\n                        <td>Languages:</td>\r\n                        <td>{{customer.languages}}</td>\r\n                      </tr>\r\n                      <tr>\r\n                        <td>Phone No.:</td>\r\n                        <td>{{customer.phoneNo}}</td>\r\n                      </tr>\r\n                    </tbody>\r\n                  </table>\r\n                  <a v-link=\"{path: '/transactions/' + customer.user_id}\" href=\"javascript:void(0)\" class=\"btn btn-primary\">View Transactions</a>\r\n                </div>\r\n              </div>\r\n            </div>\r\n          </div>\r\n        </div>\r\n\t</div>\r\n</template>";
 
 /***/ },
 /* 134 */
@@ -15706,7 +15776,7 @@
 	
 	
 	// module
-	exports.push([module.id, "#transactionsView{\n\n}", ""]);
+	exports.push([module.id, "#transactionsView{\r\n\r\n}", ""]);
 	
 	// exports
 
@@ -15742,7 +15812,7 @@
 /* 138 */
 /***/ function(module, exports) {
 
-	module.exports = "<div id=\"transactionsView\">\n\t\tTransactions View's data is: {{data}}\n\t</div>";
+	module.exports = "<div id=\"transactionsView\">\r\n\t\tTransactions View's data is: {{data}}\r\n\t</div>";
 
 /***/ }
 /******/ ]);

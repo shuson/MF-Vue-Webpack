@@ -46,10 +46,11 @@
 
 <script>
 export default {
+    name: "app",
 	data () {
 		return {
 			user: pageObject.user,
-			tabName: "dashboard",
+			tabName: pageObject.tabName,
 			
 		}
 	},
