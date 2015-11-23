@@ -18,7 +18,7 @@ export default {
 
 	route:{
 	  data({to}){
-		return store.getTransactionByIdTest(to.params.transId).then(data=>({
+		return store.getTransactionByIdTest(to.params.id).then(data=>({
 			trans: data
 		}))
 	  }

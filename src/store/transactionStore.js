@@ -12,14 +12,14 @@ export default store
  */
 
 store.getTransactionByIdTest = (id) => {
-	if(id){
+	if(id == 2){
 		return Promise.resolve({
 			id: 2,
 			price: 233,
 		})
 	}
     return Promise.resolve({
-		id: 2,
+		id: 3,
 		price: 211,
 	})
 }
