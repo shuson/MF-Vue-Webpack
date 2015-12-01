@@ -68,7 +68,7 @@ export default {
   
   route: {
   	data({to}) {
-  		return store.getCustomerByIdTest(to.params.id).then(data=>({
+  		return store.getCustomerById(to.params.id).then(data=>({
   			customer: data.customer
   		}))
   	}

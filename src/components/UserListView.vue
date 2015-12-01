@@ -85,7 +85,7 @@ export default {
 	},
 	banUser: function(id){
 		store.banUser(id).then(message=>{
-			alert(message);
+			alert(message.result);
 		})
 	},
 	unBanUser:function(id){
@@ -94,7 +94,7 @@ export default {
   },  
   route:{
   	data({to}){
-  		return store.getUsersTest().then(data=>({
+  		return store.getUsers().then(data=>({
   			data: data.users
   		}))
   	}

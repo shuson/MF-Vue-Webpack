@@ -75,7 +75,27 @@ store.getUsers = () => {
  * @return {Promise}
  */
 store.banUser = id => {
-	return Promise.resolve("Successfully ban user " + id);
+	return new Promise((resolve, reject) => {
+		$.ajax({
+			type: 'GET',
+			url: baseUrl + 'user/ban/' + id,
+			dataType: 'json',
+			beforeSend: function(xhr) {
+				xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+		  	},
+			success: function(data){
+				resolve(data)
+			},
+			fail: function(xhr){
+
+			},
+			statusCode: {
+			   401: function() {
+			     window.open("http://milesfair.com:81/auth/logout","_self")
+			   }
+			}
+		})
+	})
 }
 
 /**
