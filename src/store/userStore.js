@@ -19,9 +19,6 @@ store.getUsers = () => {
 			type: 'GET',
 			url: baseUrl + 'user',
 			dataType: 'json',
-			beforeSend: function(xhr) {
-				xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
-		  	},
 			success: function(data){
 				resolve(data)
 			},
@@ -50,9 +47,6 @@ store.getUsers = () => {
  			type: 'GET',
  			url: baseUrl + 'user/' + id,
  			dataType: 'json',
- 			beforeSend: function(xhr) {
-				xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
-		  	},
 			success: function(data){
 				resolve(data)
 			},
@@ -80,9 +74,6 @@ store.banUser = id => {
 			type: 'GET',
 			url: baseUrl + 'user/ban/' + id,
 			dataType: 'json',
-			beforeSend: function(xhr) {
-				xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
-		  	},
 			success: function(data){
 				resolve(data)
 			},
@@ -126,14 +117,14 @@ store.getUsersTest = () => {
 		},
 		{
 			id: 2,
-			email: "Tommy2",
+			email: "Jerry",
 			is_blocked: 0,
 			is_activate: 0,
 			created_at: '1992-09-18'
 		},
 		{
 			id: 3,
-			email: "Tommy3",
+			email: "Curry",
 			is_blocked: 1,
 			is_activate: 0,
 			created_at: '1992-09-18'
