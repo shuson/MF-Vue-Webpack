@@ -20,7 +20,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="entry in users | filterBy searchKey | paginator ">
+                        <tr v-for="entry in users | filterBy searchKey in 'email' | paginator ">
                             <td>{{entry['id']}}</td>
                             <td>{{entry['email']}}</td>
                             <td>
@@ -91,7 +91,6 @@ export default {
   },
   methods: {
     setPage: function(pageNumber) {
-      console.log(pageNumber)
       this.currentPage = pageNumber
     },
 	sendResetPasswordLink: function(id){
