@@ -124,7 +124,11 @@ export default {
     })
   },
   route:{
-  	
+  	data({to}){
+      return store.getUsersTest().then(data=>({
+        users: data.users
+      }))
+    }
   }
 }
 </script>
