@@ -14,7 +14,7 @@
                 <table class="table table-hover table-striped">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>Reference ID</th>
                             <th>Time</th>
                             <th></th>
                         </tr>

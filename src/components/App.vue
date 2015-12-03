@@ -168,7 +168,7 @@ ul.alert-dropdown {
         border: none;
         border-radius: 0;
         overflow-y: auto;
-        background-color: #222;
+        background-color: #3F3E3F;
         bottom: 0;
         overflow-x: hidden;
         padding-bottom: 40px;
