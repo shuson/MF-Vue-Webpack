@@ -84,7 +84,7 @@ export default {
 
     #page-wrapper {
         padding: 10px 50px;
-        min-height: 1024px;
+        min-height: 400px;
     }
 }
 

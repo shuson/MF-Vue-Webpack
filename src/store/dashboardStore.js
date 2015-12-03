@@ -12,5 +12,5 @@ export default store
  */
 
 store.test = () => {
-    return Promise.resolve("I am from dashboard store")
+    return Promise.resolve()
 }
