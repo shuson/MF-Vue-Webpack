@@ -73,7 +73,9 @@
 
 <script>
 import store from "../store/userStore"
+
 let baseUrl = ""
+
 export default {
   name: 'UserListView',
 
@@ -82,7 +84,7 @@ export default {
       users: [],
       searchKey: "",
       currentPage: 0,
-      itemsPerPage: 2,
+      itemsPerPage: 10,
       totalCount: 0
     }
   },
@@ -130,7 +132,6 @@ export default {
       baseUrl = window.location.href.split('?')[0]
       return store.getUsersTest().then(function(data){
         let page = parseInt(to.query.page) -1 || 0
-        console.log(page)
         return {
           users: data.users,
           currentPage: page

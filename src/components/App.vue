@@ -26,7 +26,7 @@
                         <a v-link="{ path: '/users?page=1'}" name="users"><i class="fa fa-fw fa-users"></i> Users</a>
                     </li>
                     <li @click="tabSwitch" :class="{'active': tabName == 'transactions'}">
-                        <a v-link="{ path: '/transactions'}" name="transactions"><i class="fa fa-fw fa-exchange"></i> Transactions</a>
+                        <a v-link="{ path: '/transactions?page=1'}" name="transactions"><i class="fa fa-fw fa-exchange"></i> Transactions</a>
                     </li>
                 </ul>
             </div>
