@@ -54,27 +54,27 @@
 	
 	var _vueRouter2 = _interopRequireDefault(_vueRouter);
 	
-	var _App = __webpack_require__(44);
+	var _App = __webpack_require__(42);
 	
 	var _App2 = _interopRequireDefault(_App);
 	
-	var _DashboardView = __webpack_require__(51);
+	var _DashboardView = __webpack_require__(49);
 	
 	var _DashboardView2 = _interopRequireDefault(_DashboardView);
 	
-	var _UserListView = __webpack_require__(60);
+	var _UserListView = __webpack_require__(58);
 	
 	var _UserListView2 = _interopRequireDefault(_UserListView);
 	
-	var _UserView = __webpack_require__(66);
+	var _UserView = __webpack_require__(64);
 	
 	var _UserView2 = _interopRequireDefault(_UserView);
 	
-	var _TransactionListView = __webpack_require__(71);
+	var _TransactionListView = __webpack_require__(69);
 	
 	var _TransactionListView2 = _interopRequireDefault(_TransactionListView);
 	
-	var _TransactionView = __webpack_require__(77);
+	var _TransactionView = __webpack_require__(75);
 	
 	var _TransactionView2 = _interopRequireDefault(_TransactionView);
 	
@@ -96,16 +96,16 @@
 		'/users': {
 			component: _UserListView2.default
 		},
-		'/user/:id': {
+		'/users/:id': {
 			component: _UserView2.default
 		},
-		'/user/:id/transactions': {
+		'/users/:id/transactions': {
 			component: _TransactionListView2.default
 		},
 		'/transactions': {
 			component: _TransactionListView2.default
 		},
-		'/transaction/:id': {
+		'/transactions/:id': {
 			component: _TransactionView2.default
 		}
 	});
@@ -9559,27 +9559,27 @@
 	
 	var _route2 = _interopRequireDefault(_route);
 	
-	var _transition = __webpack_require__(29);
+	var _transition = __webpack_require__(27);
 	
 	var _transition2 = _interopRequireDefault(_transition);
 	
-	var _directivesView = __webpack_require__(39);
+	var _directivesView = __webpack_require__(37);
 	
 	var _directivesView2 = _interopRequireDefault(_directivesView);
 	
-	var _directivesLink = __webpack_require__(40);
+	var _directivesLink = __webpack_require__(38);
 	
 	var _directivesLink2 = _interopRequireDefault(_directivesLink);
 	
-	var _historyAbstract = __webpack_require__(41);
+	var _historyAbstract = __webpack_require__(39);
 	
 	var _historyAbstract2 = _interopRequireDefault(_historyAbstract);
 	
-	var _historyHash = __webpack_require__(42);
+	var _historyHash = __webpack_require__(40);
 	
 	var _historyHash2 = _interopRequireDefault(_historyHash);
 	
-	var _historyHtml5 = __webpack_require__(43);
+	var _historyHtml5 = __webpack_require__(41);
 	
 	var _historyHtml52 = _interopRequireDefault(_historyHtml5);
 	
@@ -10174,7 +10174,7 @@
 
 	"use strict";
 	
-	exports["default"] = function (instance, Constructor) {
+	exports.default = function (instance, Constructor) {
 	  if (!(instance instanceof Constructor)) {
 	    throw new TypeError("Cannot call a class as a function");
 	  }
@@ -10188,9 +10188,9 @@
 
 	"use strict";
 	
-	exports["default"] = function (obj) {
+	exports.default = function (obj) {
 	  return obj && obj.__esModule ? obj : {
-	    "default": obj
+	    default: obj
 	  };
 	};
 	
@@ -11214,14 +11214,15 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	// most Object methods by ES6 should accept primitives
-	var $export = __webpack_require__(23)
-	  , core    = __webpack_require__(25)
-	  , fails   = __webpack_require__(28);
+	var $def  = __webpack_require__(23)
+	  , core  = __webpack_require__(25)
+	  , fails = __webpack_require__(26);
 	module.exports = function(KEY, exec){
-	  var fn  = (core.Object || {})[KEY] || Object[KEY]
-	    , exp = {};
+	  var $def = __webpack_require__(23)
+	    , fn   = (core.Object || {})[KEY] || Object[KEY]
+	    , exp  = {};
 	  exp[KEY] = exec(fn);
-	  $export($export.S + $export.F * fails(function(){ fn(1); }), 'Object', exp);
+	  $def($def.S + $def.F * fails(function(){ fn(1); }), 'Object', exp);
 	};
 
 /***/ },
@@ -11230,50 +11231,51 @@
 
 	var global    = __webpack_require__(24)
 	  , core      = __webpack_require__(25)
-	  , ctx       = __webpack_require__(26)
 	  , PROTOTYPE = 'prototype';
-	
-	var $export = function(type, name, source){
-	  var IS_FORCED = type & $export.F
-	    , IS_GLOBAL = type & $export.G
-	    , IS_STATIC = type & $export.S
-	    , IS_PROTO  = type & $export.P
-	    , IS_BIND   = type & $export.B
-	    , IS_WRAP   = type & $export.W
-	    , exports   = IS_GLOBAL ? core : core[name] || (core[name] = {})
-	    , target    = IS_GLOBAL ? global : IS_STATIC ? global[name] : (global[name] || {})[PROTOTYPE]
-	    , key, own, out;
-	  if(IS_GLOBAL)source = name;
+	var ctx = function(fn, that){
+	  return function(){
+	    return fn.apply(that, arguments);
+	  };
+	};
+	var $def = function(type, name, source){
+	  var key, own, out, exp
+	    , isGlobal = type & $def.G
+	    , isProto  = type & $def.P
+	    , target   = isGlobal ? global : type & $def.S
+	        ? global[name] : (global[name] || {})[PROTOTYPE]
+	    , exports  = isGlobal ? core : core[name] || (core[name] = {});
+	  if(isGlobal)source = name;
 	  for(key in source){
 	    // contains in native
-	    own = !IS_FORCED && target && key in target;
+	    own = !(type & $def.F) && target && key in target;
 	    if(own && key in exports)continue;
 	    // export native or passed
 	    out = own ? target[key] : source[key];
 	    // prevent global pollution for namespaces
-	    exports[key] = IS_GLOBAL && typeof target[key] != 'function' ? source[key]
+	    if(isGlobal && typeof target[key] != 'function')exp = source[key];
 	    // bind timers to global for call from export context
-	    : IS_BIND && own ? ctx(out, global)
+	    else if(type & $def.B && own)exp = ctx(out, global);
 	    // wrap global constructors for prevent change them in library
-	    : IS_WRAP && target[key] == out ? (function(C){
-	      var F = function(param){
+	    else if(type & $def.W && target[key] == out)!function(C){
+	      exp = function(param){
 	        return this instanceof C ? new C(param) : C(param);
 	      };
-	      F[PROTOTYPE] = C[PROTOTYPE];
-	      return F;
-	    // make static versions for prototype methods
-	    })(out) : IS_PROTO && typeof out == 'function' ? ctx(Function.call, out) : out;
-	    if(IS_PROTO)(exports[PROTOTYPE] || (exports[PROTOTYPE] = {}))[key] = out;
+	      exp[PROTOTYPE] = C[PROTOTYPE];
+	    }(out);
+	    else exp = isProto && typeof out == 'function' ? ctx(Function.call, out) : out;
+	    // export
+	    exports[key] = exp;
+	    if(isProto)(exports[PROTOTYPE] || (exports[PROTOTYPE] = {}))[key] = out;
 	  }
 	};
 	// type bitmap
-	$export.F = 1;  // forced
-	$export.G = 2;  // global
-	$export.S = 4;  // static
-	$export.P = 8;  // proto
-	$export.B = 16; // bind
-	$export.W = 32; // wrap
-	module.exports = $export;
+	$def.F = 1;  // forced
+	$def.G = 2;  // global
+	$def.S = 4;  // static
+	$def.P = 8;  // proto
+	$def.B = 16; // bind
+	$def.W = 32; // wrap
+	module.exports = $def;
 
 /***/ },
 /* 24 */
@@ -11288,45 +11290,11 @@
 /* 25 */
 /***/ function(module, exports) {
 
-	var core = module.exports = {version: '1.2.6'};
+	var core = module.exports = {version: '1.2.5'};
 	if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
 
 /***/ },
 /* 26 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// optional / simple context binding
-	var aFunction = __webpack_require__(27);
-	module.exports = function(fn, that, length){
-	  aFunction(fn);
-	  if(that === undefined)return fn;
-	  switch(length){
-	    case 1: return function(a){
-	      return fn.call(that, a);
-	    };
-	    case 2: return function(a, b){
-	      return fn.call(that, a, b);
-	    };
-	    case 3: return function(a, b, c){
-	      return fn.call(that, a, b, c);
-	    };
-	  }
-	  return function(/* ...args */){
-	    return fn.apply(that, arguments);
-	  };
-	};
-
-/***/ },
-/* 27 */
-/***/ function(module, exports) {
-
-	module.exports = function(it){
-	  if(typeof it != 'function')throw TypeError(it + ' is not a function!');
-	  return it;
-	};
-
-/***/ },
-/* 28 */
 /***/ function(module, exports) {
 
 	module.exports = function(exec){
@@ -11338,7 +11306,7 @@
 	};
 
 /***/ },
-/* 29 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -11349,7 +11317,7 @@
 	
 	var _util = __webpack_require__(12);
 	
-	var _pipeline = __webpack_require__(30);
+	var _pipeline = __webpack_require__(28);
 	
 	/**
 	 * A RouteTransition object manages the pipeline of a
@@ -11671,14 +11639,14 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 30 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var _Object$keys = __webpack_require__(31)['default'];
+	var _Object$keys = __webpack_require__(29)['default'];
 	
-	var _Object$create = __webpack_require__(36)['default'];
+	var _Object$create = __webpack_require__(34)['default'];
 	
 	exports.__esModule = true;
 	exports.canReuse = canReuse;
@@ -11994,24 +11962,24 @@
 	}
 
 /***/ },
-/* 31 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = { "default": __webpack_require__(32), __esModule: true };
+	module.exports = { "default": __webpack_require__(30), __esModule: true };
 
 /***/ },
-/* 32 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(33);
+	__webpack_require__(31);
 	module.exports = __webpack_require__(25).Object.keys;
 
 /***/ },
-/* 33 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// 19.1.2.14 Object.keys(O)
-	var toObject = __webpack_require__(34);
+	var toObject = __webpack_require__(32);
 	
 	__webpack_require__(22)('keys', function($keys){
 	  return function keys(it){
@@ -12020,17 +11988,17 @@
 	});
 
 /***/ },
-/* 34 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// 7.1.13 ToObject(argument)
-	var defined = __webpack_require__(35);
+	var defined = __webpack_require__(33);
 	module.exports = function(it){
 	  return Object(defined(it));
 	};
 
 /***/ },
-/* 35 */
+/* 33 */
 /***/ function(module, exports) {
 
 	// 7.2.1 RequireObjectCoercible(argument)
@@ -12040,22 +12008,22 @@
 	};
 
 /***/ },
-/* 36 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = { "default": __webpack_require__(37), __esModule: true };
+	module.exports = { "default": __webpack_require__(35), __esModule: true };
 
 /***/ },
-/* 37 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $ = __webpack_require__(38);
+	var $ = __webpack_require__(36);
 	module.exports = function create(P, D){
 	  return $.create(P, D);
 	};
 
 /***/ },
-/* 38 */
+/* 36 */
 /***/ function(module, exports) {
 
 	var $Object = Object;
@@ -12073,7 +12041,7 @@
 	};
 
 /***/ },
-/* 39 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -12082,7 +12050,7 @@
 	
 	var _util = __webpack_require__(12);
 	
-	var _pipeline = __webpack_require__(30);
+	var _pipeline = __webpack_require__(28);
 	
 	exports['default'] = function (Vue) {
 	
@@ -12154,7 +12122,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 40 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -12294,7 +12262,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 41 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -12339,7 +12307,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 42 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -12408,7 +12376,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 43 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -12501,14 +12469,14 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 44 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(45)
-	module.exports = __webpack_require__(49)
+	__webpack_require__(43)
+	module.exports = __webpack_require__(47)
 	
 	if (module.exports.__esModule) module.exports = module.exports.default
-	;(typeof module.exports === "function" ? module.exports.options : module.exports).template = __webpack_require__(50)
+	;(typeof module.exports === "function" ? module.exports.options : module.exports).template = __webpack_require__(48)
 	if (false) {
 	(function () {
 	var hotAPI = require("vue-hot-reload-api")
@@ -12526,23 +12494,23 @@
 	}
 
 /***/ },
-/* 45 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(46);
+	var content = __webpack_require__(44);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(48)(content, {});
+	var update = __webpack_require__(46)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-b4934ede&file=App.vue!./../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./App.vue", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-b4934ede&file=App.vue!./../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./App.vue");
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-3fa4d6d8&file=App.vue!./../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./App.vue", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-3fa4d6d8&file=App.vue!./../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./App.vue");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -12552,21 +12520,21 @@
 	}
 
 /***/ },
-/* 46 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(47)();
+	exports = module.exports = __webpack_require__(45)();
 	// imports
 	
 	
 	// module
-	exports.push([module.id, "#wrapper {\r\n    padding-left: 0;\r\n}\r\n\r\n#page-wrapper {\r\n    width: 100%;\r\n    padding: 10px 50px;\r\n    height:100%; \r\n    background-color: #fff;\r\n}\r\n\r\n@media(min-width:768px) {\r\n    #wrapper {\r\n        padding-left: 225px;\r\n    }\r\n\r\n    #page-wrapper {\r\n        padding: 10px 50px;\r\n        min-height: 1024px;\r\n    }\r\n}\r\n\r\n/* Top Navigation */\r\n\r\n.top-nav {\r\n    padding: 0 15px;\r\n}\r\n\r\n.top-nav>li {\r\n    display: inline-block;\r\n    float: left;\r\n}\r\n\r\n.top-nav>li>a {\r\n    padding-top: 15px;\r\n    padding-bottom: 15px;\r\n    line-height: 20px;\r\n    color: #999;\r\n}\r\n\r\n.top-nav>li>a:hover,\r\n.top-nav>li>a:focus,\r\n.top-nav>.open>a,\r\n.top-nav>.open>a:hover,\r\n.top-nav>.open>a:focus {\r\n    color: #fff;\r\n    background-color: #000;\r\n}\r\n\r\n.top-nav>.open>.dropdown-menu {\r\n    float: left;\r\n    position: absolute;\r\n    margin-top: 0;\r\n    border: 1px solid rgba(0,0,0,.15);\r\n    border-top-left-radius: 0;\r\n    border-top-right-radius: 0;\r\n    background-color: #fff;\r\n    box-shadow: 0 6px 12px rgba(0,0,0,.175);\r\n}\r\n\r\n.top-nav>.open>.dropdown-menu>li>a {\r\n    white-space: normal;\r\n}\r\n\r\nul.message-dropdown {\r\n    padding: 0;\r\n    max-height: 250px;\r\n    overflow-x: hidden;\r\n    overflow-y: auto;\r\n}\r\n\r\nli.message-preview {\r\n    width: 275px;\r\n    border-bottom: 1px solid rgba(0,0,0,.15);\r\n}\r\n\r\nli.message-preview>a {\r\n    padding-top: 15px;\r\n    padding-bottom: 15px;\r\n}\r\n\r\nli.message-footer {\r\n    margin: 5px 0;\r\n}\r\n\r\nul.alert-dropdown {\r\n    width: 200px;\r\n}\r\n\r\n/* Side Navigation */\r\n\r\n@media(min-width:768px) {\r\n    .side-nav {\r\n        position: fixed;\r\n        top: 51px;\r\n        left: 225px;\r\n        width: 225px;\r\n        margin-left: -225px;\r\n        border: none;\r\n        border-radius: 0;\r\n        overflow-y: auto;\r\n        background-color: #222;\r\n        bottom: 0;\r\n        overflow-x: hidden;\r\n        padding-bottom: 40px;\r\n    }\r\n\r\n    .side-nav>li>a {\r\n        width: 225px;\r\n    }\r\n\r\n    .side-nav li a:hover,\r\n    .side-nav li a:focus {\r\n        outline: none;\r\n        background-color: #000 !important;\r\n    }\r\n}\r\n\r\n.side-nav>li>ul {\r\n    padding: 0;\r\n}\r\n\r\n.side-nav>li>ul>li>a {\r\n    display: block;\r\n    padding: 10px 15px 10px 38px;\r\n    text-decoration: none;\r\n    color: #999;\r\n}\r\n\r\n.side-nav>li>ul>li>a:hover {\r\n    color: #fff;\r\n}", ""]);
+	exports.push([module.id, "#wrapper {\n    padding-left: 0;\n}\n\n#page-wrapper {\n    width: 100%;\n    padding: 10px 50px;\n    height:100%; \n    background-color: #fff;\n}\n\n@media(min-width:768px) {\n    #wrapper {\n        padding-left: 225px;\n    }\n\n    #page-wrapper {\n        padding: 10px 50px;\n        min-height: 400px;\n    }\n}\n\n/* Top Navigation */\n\n.top-nav {\n    padding: 0 15px;\n}\n\n.top-nav>li {\n    display: inline-block;\n    float: left;\n}\n\n.top-nav>li>a {\n    padding-top: 15px;\n    padding-bottom: 15px;\n    line-height: 20px;\n    color: #999;\n}\n\n.top-nav>li>a:hover,\n.top-nav>li>a:focus,\n.top-nav>.open>a,\n.top-nav>.open>a:hover,\n.top-nav>.open>a:focus {\n    color: #fff;\n    background-color: #000;\n}\n\n.top-nav>.open>.dropdown-menu {\n    float: left;\n    position: absolute;\n    margin-top: 0;\n    border: 1px solid rgba(0,0,0,.15);\n    border-top-left-radius: 0;\n    border-top-right-radius: 0;\n    background-color: #fff;\n    box-shadow: 0 6px 12px rgba(0,0,0,.175);\n}\n\n.top-nav>.open>.dropdown-menu>li>a {\n    white-space: normal;\n}\n\nul.message-dropdown {\n    padding: 0;\n    max-height: 250px;\n    overflow-x: hidden;\n    overflow-y: auto;\n}\n\nli.message-preview {\n    width: 275px;\n    border-bottom: 1px solid rgba(0,0,0,.15);\n}\n\nli.message-preview>a {\n    padding-top: 15px;\n    padding-bottom: 15px;\n}\n\nli.message-footer {\n    margin: 5px 0;\n}\n\nul.alert-dropdown {\n    width: 200px;\n}\n\n/* Side Navigation */\n\n@media(min-width:768px) {\n    .side-nav {\n        position: fixed;\n        top: 51px;\n        left: 225px;\n        width: 225px;\n        margin-left: -225px;\n        border: none;\n        border-radius: 0;\n        overflow-y: auto;\n        background-color: #222;\n        bottom: 0;\n        overflow-x: hidden;\n        padding-bottom: 40px;\n    }\n\n    .side-nav>li>a {\n        width: 225px;\n    }\n\n    .side-nav li a:hover,\n    .side-nav li a:focus {\n        outline: none;\n        background-color: #000 !important;\n    }\n}\n\n.side-nav>li>ul {\n    padding: 0;\n}\n\n.side-nav>li>ul>li>a {\n    display: block;\n    padding: 10px 15px 10px 38px;\n    text-decoration: none;\n    color: #999;\n}\n\n.side-nav>li>ul>li>a:hover {\n    color: #fff;\n}", ""]);
 	
 	// exports
 
 
 /***/ },
-/* 47 */
+/* 45 */
 /***/ function(module, exports) {
 
 	/*
@@ -12622,7 +12590,7 @@
 
 
 /***/ },
-/* 48 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -12876,7 +12844,7 @@
 
 
 /***/ },
-/* 49 */
+/* 47 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -12885,89 +12853,47 @@
 		value: true
 	});
 	// <template>
-	
 	// 	<div id="wrapper">
-	
 	// 		<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-	
 	//             <!-- Brand and toggle get grouped for better mobile display -->
-	
 	//             <div class="navbar-header">
-	
 	//                 <a class="navbar-brand" href="#/">Admin Panel</a>
-	
 	//             </div>
-	
 	//             <!-- Top Menu Items -->
-	
 	//             <ul class="nav navbar-right top-nav">
-	
 	//                 <li class="dropdown">
-	
 	//                     <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> {{user.name}} <b class="caret"></b></a>
-	
 	//                     <ul class="dropdown-menu">
-	
 	//                         <li>
-	
 	//                             <a href="/auth/logout"><i class="fa fa-fw fa-power-off"></i> Log Out</a>
-	
 	//                         </li>
-	
 	//                     </ul>
-	
 	//                 </li>
-	
 	//             </ul>
-	
 	//             <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
-	
 	//             <div class="collapse navbar-collapse navbar-ex1-collapse">
-	
 	//                 <ul class="nav navbar-nav side-nav">
-	
 	//                     <li @click="tabSwitch" :class="{'active': tabName == 'dashboard'}">
-	
 	//                         <a v-link="{ path: '/'}" name="dashboard"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
-	
 	//                     </li>
-	
 	//                     <li @click="tabSwitch" :class="{'active': tabName == 'users'}">
-	
-	//                         <a v-link="{ path: '/users'}" name="users"><i class="fa fa-fw fa-users"></i> Users</a>
-	
+	//                         <a v-link="{ path: '/users?page=1'}" name="users"><i class="fa fa-fw fa-users"></i> Users</a>
 	//                     </li>
-	
 	//                     <li @click="tabSwitch" :class="{'active': tabName == 'transactions'}">
-	
-	//                         <a v-link="{ path: '/transactions'}" name="transactions"><i class="fa fa-fw fa-exchange"></i> Transactions</a>
-	
+	//                         <a v-link="{ path: '/transactions?page=1'}" name="transactions"><i class="fa fa-fw fa-exchange"></i> Transactions</a>
 	//                     </li>
-	
 	//                 </ul>
-	
 	//             </div>
-	
 	//             <!-- /.navbar-collapse -->
-	
 	//         </nav>
-	
 	//          <!-- main view -->
-	
 	//          <div id="page-wrapper">
-	
 	//          	<router-view
-	
 	// 		      keep-alive
-	
 	// 			  >
-	
 	// 		    </router-view>
-	
 	//          </div>
-	
 	// 	</div>
-	
 	// </template>
 	
 	// <script>
@@ -12995,246 +12921,156 @@
 	// </script>
 
 	// <style>
-
 	// #wrapper {
-
 	//     padding-left: 0;
-
 	// }
 
 	// #page-wrapper {
-
 	//     width: 100%;
-
 	//     padding: 10px 50px;
-
 	//     height:100%;
-
 	//     background-color: #fff;
-
 	// }
 
 	// @media(min-width:768px) {
-
 	//     #wrapper {
-
 	//         padding-left: 225px;
-
 	//     }
 
 	//     #page-wrapper {
-
 	//         padding: 10px 50px;
-
-	//         min-height: 1024px;
-
+	//         min-height: 400px;
 	//     }
-
 	// }
 
 	// /* Top Navigation */
 
 	// .top-nav {
-
 	//     padding: 0 15px;
-
 	// }
 
 	// .top-nav>li {
-
 	//     display: inline-block;
-
 	//     float: left;
-
 	// }
 
 	// .top-nav>li>a {
-
 	//     padding-top: 15px;
-
 	//     padding-bottom: 15px;
-
 	//     line-height: 20px;
-
 	//     color: #999;
-
 	// }
 
 	// .top-nav>li>a:hover,
-
 	// .top-nav>li>a:focus,
-
 	// .top-nav>.open>a,
-
 	// .top-nav>.open>a:hover,
-
 	// .top-nav>.open>a:focus {
-
 	//     color: #fff;
-
 	//     background-color: #000;
-
 	// }
 
 	// .top-nav>.open>.dropdown-menu {
-
 	//     float: left;
-
 	//     position: absolute;
-
 	//     margin-top: 0;
-
 	//     border: 1px solid rgba(0,0,0,.15);
-
 	//     border-top-left-radius: 0;
-
 	//     border-top-right-radius: 0;
-
 	//     background-color: #fff;
-
 	//     -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
-
 	//     box-shadow: 0 6px 12px rgba(0,0,0,.175);
-
 	// }
 
 	// .top-nav>.open>.dropdown-menu>li>a {
-
 	//     white-space: normal;
-
 	// }
 
 	// ul.message-dropdown {
-
 	//     padding: 0;
-
 	//     max-height: 250px;
-
 	//     overflow-x: hidden;
-
 	//     overflow-y: auto;
-
 	// }
 
 	// li.message-preview {
-
 	//     width: 275px;
-
 	//     border-bottom: 1px solid rgba(0,0,0,.15);
-
 	// }
 
 	// li.message-preview>a {
-
 	//     padding-top: 15px;
-
 	//     padding-bottom: 15px;
-
 	// }
 
 	// li.message-footer {
-
 	//     margin: 5px 0;
-
 	// }
 
 	// ul.alert-dropdown {
-
 	//     width: 200px;
-
 	// }
 
 	// /* Side Navigation */
 
 	// @media(min-width:768px) {
-
 	//     .side-nav {
-
 	//         position: fixed;
-
 	//         top: 51px;
-
 	//         left: 225px;
-
 	//         width: 225px;
-
 	//         margin-left: -225px;
-
 	//         border: none;
-
 	//         border-radius: 0;
-
 	//         overflow-y: auto;
-
 	//         background-color: #222;
-
 	//         bottom: 0;
-
 	//         overflow-x: hidden;
-
 	//         padding-bottom: 40px;
-
 	//     }
 
 	//     .side-nav>li>a {
-
 	//         width: 225px;
-
 	//     }
 
 	//     .side-nav li a:hover,
-
 	//     .side-nav li a:focus {
-
 	//         outline: none;
-
 	//         background-color: #000 !important;
-
 	//     }
-
 	// }
 
 	// .side-nav>li>ul {
-
 	//     padding: 0;
-
 	// }
 
 	// .side-nav>li>ul>li>a {
-
 	//     display: block;
-
 	//     padding: 10px 15px 10px 38px;
-
 	//     text-decoration: none;
-
 	//     color: #999;
-
 	// }
 
 	// .side-nav>li>ul>li>a:hover {
-
 	//     color: #fff;
-
 	// }
-
 	// </style>
 
 /***/ },
-/* 50 */
+/* 48 */
 /***/ function(module, exports) {
 
-	module.exports = "<div id=\"wrapper\">\r\n\t\t<nav class=\"navbar navbar-inverse navbar-fixed-top\" role=\"navigation\">\r\n            <!-- Brand and toggle get grouped for better mobile display -->\r\n            <div class=\"navbar-header\">\r\n                <a class=\"navbar-brand\" href=\"#/\">Admin Panel</a>\r\n            </div>\r\n            <!-- Top Menu Items -->\r\n            <ul class=\"nav navbar-right top-nav\">\r\n                <li class=\"dropdown\">\r\n                    <a href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\"><i class=\"fa fa-user\"></i> {{user.name}} <b class=\"caret\"></b></a>\r\n                    <ul class=\"dropdown-menu\"> \r\n                        <li>\r\n                            <a href=\"/auth/logout\"><i class=\"fa fa-fw fa-power-off\"></i> Log Out</a>\r\n                        </li>\r\n                    </ul>\r\n                </li>\r\n            </ul>\r\n            <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->\r\n            <div class=\"collapse navbar-collapse navbar-ex1-collapse\">\r\n                <ul class=\"nav navbar-nav side-nav\">\r\n                    <li @click=\"tabSwitch\" :class=\"{'active': tabName == 'dashboard'}\">\r\n                        <a v-link=\"{ path: '/'}\" name=\"dashboard\"><i class=\"fa fa-fw fa-dashboard\"></i> Dashboard</a>\r\n                    </li>\r\n                    <li @click=\"tabSwitch\" :class=\"{'active': tabName == 'users'}\">\r\n                        <a v-link=\"{ path: '/users'}\" name=\"users\"><i class=\"fa fa-fw fa-users\"></i> Users</a>\r\n                    </li>\r\n                    <li @click=\"tabSwitch\" :class=\"{'active': tabName == 'transactions'}\">\r\n                        <a v-link=\"{ path: '/transactions'}\" name=\"transactions\"><i class=\"fa fa-fw fa-exchange\"></i> Transactions</a>\r\n                    </li>\r\n                </ul>\r\n            </div>\r\n            <!-- /.navbar-collapse -->\r\n        </nav>\r\n         <!-- main view -->\r\n         <div id=\"page-wrapper\">\r\n         \t<router-view\r\n\t\t      keep-alive\r\n\t\t\t  >\r\n\t\t    </router-view>\r\n         </div>\r\n\t</div>";
+	module.exports = "<div id=\"wrapper\">\n\t\t<nav class=\"navbar navbar-inverse navbar-fixed-top\" role=\"navigation\">\n            <!-- Brand and toggle get grouped for better mobile display -->\n            <div class=\"navbar-header\">\n                <a class=\"navbar-brand\" href=\"#/\">Admin Panel</a>\n            </div>\n            <!-- Top Menu Items -->\n            <ul class=\"nav navbar-right top-nav\">\n                <li class=\"dropdown\">\n                    <a href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\"><i class=\"fa fa-user\"></i> {{user.name}} <b class=\"caret\"></b></a>\n                    <ul class=\"dropdown-menu\"> \n                        <li>\n                            <a href=\"/auth/logout\"><i class=\"fa fa-fw fa-power-off\"></i> Log Out</a>\n                        </li>\n                    </ul>\n                </li>\n            </ul>\n            <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->\n            <div class=\"collapse navbar-collapse navbar-ex1-collapse\">\n                <ul class=\"nav navbar-nav side-nav\">\n                    <li @click=\"tabSwitch\" :class=\"{'active': tabName == 'dashboard'}\">\n                        <a v-link=\"{ path: '/'}\" name=\"dashboard\"><i class=\"fa fa-fw fa-dashboard\"></i> Dashboard</a>\n                    </li>\n                    <li @click=\"tabSwitch\" :class=\"{'active': tabName == 'users'}\">\n                        <a v-link=\"{ path: '/users?page=1'}\" name=\"users\"><i class=\"fa fa-fw fa-users\"></i> Users</a>\n                    </li>\n                    <li @click=\"tabSwitch\" :class=\"{'active': tabName == 'transactions'}\">\n                        <a v-link=\"{ path: '/transactions?page=1'}\" name=\"transactions\"><i class=\"fa fa-fw fa-exchange\"></i> Transactions</a>\n                    </li>\n                </ul>\n            </div>\n            <!-- /.navbar-collapse -->\n        </nav>\n         <!-- main view -->\n         <div id=\"page-wrapper\">\n         \t<router-view\n\t\t      keep-alive\n\t\t\t  >\n\t\t    </router-view>\n         </div>\n\t</div>";
 
 /***/ },
-/* 51 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(52)
-	module.exports = __webpack_require__(54)
+	__webpack_require__(50)
+	module.exports = __webpack_require__(52)
 	
 	if (module.exports.__esModule) module.exports = module.exports.default
-	;(typeof module.exports === "function" ? module.exports.options : module.exports).template = __webpack_require__(59)
+	;(typeof module.exports === "function" ? module.exports.options : module.exports).template = __webpack_require__(57)
 	if (false) {
 	(function () {
 	var hotAPI = require("vue-hot-reload-api")
@@ -13252,23 +13088,23 @@
 	}
 
 /***/ },
-/* 52 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(53);
+	var content = __webpack_require__(51);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(48)(content, {});
+	var update = __webpack_require__(46)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-3bfc23c9&file=DashboardView.vue!./../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./DashboardView.vue", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-3bfc23c9&file=DashboardView.vue!./../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./DashboardView.vue");
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-c05a9560&file=DashboardView.vue!./../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./DashboardView.vue", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-c05a9560&file=DashboardView.vue!./../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./DashboardView.vue");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -13278,21 +13114,21 @@
 	}
 
 /***/ },
-/* 53 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(47)();
+	exports = module.exports = __webpack_require__(45)();
 	// imports
 	
 	
 	// module
-	exports.push([module.id, "#dashbaordView{\r\n    \r\n}\r\n\r\n.panel-green {\r\n    border-color: #5cb85c;\r\n}\r\n\r\n.panel-green > .panel-heading {\r\n    border-color: #5cb85c;\r\n    color: #fff;\r\n    background-color: #5cb85c;\r\n}\r\n\r\n.panel-green > a {\r\n    color: #5cb85c;\r\n}\r\n\r\n.panel-green > a:hover {\r\n    color: #3d8b3d;\r\n}\r\n\r\n.panel-red {\r\n    border-color: #d9534f;\r\n}\r\n\r\n.panel-red > .panel-heading {\r\n    border-color: #d9534f;\r\n    color: #fff;\r\n    background-color: #d9534f;\r\n}\r\n\r\n.panel-red > a {\r\n    color: #d9534f;\r\n}\r\n\r\n.panel-red > a:hover {\r\n    color: #b52b27;\r\n}\r\n\r\n.panel-yellow {\r\n    border-color: #f0ad4e;\r\n}\r\n\r\n.panel-yellow > .panel-heading {\r\n    border-color: #f0ad4e;\r\n    color: #fff;\r\n    background-color: #f0ad4e;\r\n}\r\n\r\n.panel-yellow > a {\r\n    color: #f0ad4e;\r\n}\r\n\r\n.panel-yellow > a:hover {\r\n    color: #df8a13;\r\n}", ""]);
+	exports.push([module.id, "#dashbaordView{\n    \n}\n\n.panel-green {\n    border-color: #5cb85c;\n}\n\n.panel-green > .panel-heading {\n    border-color: #5cb85c;\n    color: #fff;\n    background-color: #5cb85c;\n}\n\n.panel-green > a {\n    color: #5cb85c;\n}\n\n.panel-green > a:hover {\n    color: #3d8b3d;\n}\n\n.panel-red {\n    border-color: #d9534f;\n}\n\n.panel-red > .panel-heading {\n    border-color: #d9534f;\n    color: #fff;\n    background-color: #d9534f;\n}\n\n.panel-red > a {\n    color: #d9534f;\n}\n\n.panel-red > a:hover {\n    color: #b52b27;\n}\n\n.panel-yellow {\n    border-color: #f0ad4e;\n}\n\n.panel-yellow > .panel-heading {\n    border-color: #f0ad4e;\n    color: #fff;\n    background-color: #f0ad4e;\n}\n\n.panel-yellow > a {\n    color: #f0ad4e;\n}\n\n.panel-yellow > a:hover {\n    color: #df8a13;\n}", ""]);
 	
 	// exports
 
 
 /***/ },
-/* 54 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -13301,7 +13137,7 @@
 	  value: true
 	});
 	
-	var _dashboardStore = __webpack_require__(55);
+	var _dashboardStore = __webpack_require__(53);
 	
 	var _dashboardStore2 = _interopRequireDefault(_dashboardStore);
 	
@@ -13325,246 +13161,143 @@
 	// </script>
 
 	// <style>
-
 	// #dashbaordView{
 
 	// }
 
 	// .panel-green {
-
 	//     border-color: #5cb85c;
-
 	// }
 
 	// .panel-green > .panel-heading {
-
 	//     border-color: #5cb85c;
-
 	//     color: #fff;
-
 	//     background-color: #5cb85c;
-
 	// }
 
 	// .panel-green > a {
-
 	//     color: #5cb85c;
-
 	// }
 
 	// .panel-green > a:hover {
-
 	//     color: #3d8b3d;
-
 	// }
 
 	// .panel-red {
-
 	//     border-color: #d9534f;
-
 	// }
 
 	// .panel-red > .panel-heading {
-
 	//     border-color: #d9534f;
-
 	//     color: #fff;
-
 	//     background-color: #d9534f;
-
 	// }
 
 	// .panel-red > a {
-
 	//     color: #d9534f;
-
 	// }
 
 	// .panel-red > a:hover {
-
 	//     color: #b52b27;
-
 	// }
 
 	// .panel-yellow {
-
 	//     border-color: #f0ad4e;
-
 	// }
 
 	// .panel-yellow > .panel-heading {
-
 	//     border-color: #f0ad4e;
-
 	//     color: #fff;
-
 	//     background-color: #f0ad4e;
-
 	// }
 
 	// .panel-yellow > a {
-
 	//     color: #f0ad4e;
-
 	// }
 
 	// .panel-yellow > a:hover {
-
 	//     color: #df8a13;
-
 	// }
 
 	// </style>
 	// <template>
-
 	// 	<div id="dashbaordView" class="container-fluid">
-
 	// 		{{message}}
-
 	// 	</div>
-
 	// 	 <div class="row">
-
 	//         <div class="col-lg-4 col-md-6">
-
 	//             <div class="panel panel-primary">
-
 	//                 <div class="panel-heading">
-
 	//                     <div class="row">
-
 	//                         <div class="col-xs-3">
-
 	//                             <i class="fa fa-comments fa-5x"></i>
-
 	//                         </div>
-
 	//                         <div class="col-xs-9 text-right">
-
 	//                             <div class="huge">26</div>
-
 	//                             <div>New Comments!</div>
-
 	//                         </div>
-
 	//                     </div>
-
 	//                 </div>
-
 	//                 <a href="#">
-
 	//                     <div class="panel-footer">
-
 	//                         <span class="pull-left">View Details</span>
-
 	//                         <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-
 	//                         <div class="clearfix"></div>
-
 	//                     </div>
-
 	//                 </a>
-
 	//             </div>
-
 	//         </div>
-
 	//         <div class="col-lg-4 col-md-6">
-
 	//             <div class="panel panel-green">
-
 	//                 <div class="panel-heading">
-
 	//                     <div class="row">
-
 	//                         <div class="col-xs-3">
-
 	//                             <i class="fa fa-tasks fa-5x"></i>
-
 	//                         </div>
-
 	//                         <div class="col-xs-9 text-right">
-
 	//                             <div class="huge">12</div>
-
 	//                             <div>New Tasks!</div>
-
 	//                         </div>
-
 	//                     </div>
-
 	//                 </div>
-
 	//                 <a href="#">
-
 	//                     <div class="panel-footer">
-
 	//                         <span class="pull-left">View Details</span>
-
 	//                         <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-
 	//                         <div class="clearfix"></div>
-
 	//                     </div>
-
 	//                 </a>
-
 	//             </div>
-
 	//         </div>
-
 	//         <div class="col-lg-4 col-md-6">
-
 	//             <div class="panel panel-yellow">
-
 	//                 <div class="panel-heading">
-
 	//                     <div class="row">
-
 	//                         <div class="col-xs-3">
-
 	//                             <i class="fa fa-shopping-cart fa-5x"></i>
-
 	//                         </div>
-
 	//                         <div class="col-xs-9 text-right">
-
 	//                             <div class="huge">124</div>
-
 	//                             <div>New Orders!</div>
-
 	//                         </div>
-
 	//                     </div>
-
 	//                 </div>
-
 	//                 <a href="#">
-
 	//                     <div class="panel-footer">
-
 	//                         <span class="pull-left">View Details</span>
-
 	//                         <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-
 	//                         <div class="clearfix"></div>
-
 	//                     </div>
-
 	//                 </a>
-
 	//             </div>
-
 	//         </div>
-
 	//     </div>
-
 	// </template>
 
 	// <script>
 
 /***/ },
-/* 55 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -13573,9 +13306,9 @@
 	  value: true
 	});
 	
-	var _events = __webpack_require__(56);
+	var _events = __webpack_require__(54);
 	
-	var _es6Promise = __webpack_require__(57);
+	var _es6Promise = __webpack_require__(55);
 	
 	var store = new _events.EventEmitter();
 	
@@ -13588,11 +13321,11 @@
 	 */
 	
 	store.test = function () {
-	  return _es6Promise.Promise.resolve("I am from dashboard store");
+	  return _es6Promise.Promise.resolve();
 	};
 
 /***/ },
-/* 56 */
+/* 54 */
 /***/ function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
@@ -13896,7 +13629,7 @@
 
 
 /***/ },
-/* 57 */
+/* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var require;var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(process, global, module) {/*!
@@ -14030,7 +13763,7 @@
 	    function lib$es6$promise$asap$$attemptVertx() {
 	      try {
 	        var r = require;
-	        var vertx = __webpack_require__(58);
+	        var vertx = __webpack_require__(56);
 	        lib$es6$promise$asap$$vertxNext = vertx.runOnLoop || vertx.runOnContext;
 	        return lib$es6$promise$asap$$useVertxTimer();
 	      } catch(e) {
@@ -14870,26 +14603,26 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8), (function() { return this; }()), __webpack_require__(14)(module)))
 
 /***/ },
-/* 58 */
+/* 56 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 59 */
+/* 57 */
 /***/ function(module, exports) {
 
-	module.exports = "<div id=\"dashbaordView\" class=\"container-fluid\">\r\n\t\t{{message}}\r\n\t</div>\r\n\t <div class=\"row\">\r\n        <div class=\"col-lg-4 col-md-6\">\r\n            <div class=\"panel panel-primary\">\r\n                <div class=\"panel-heading\">\r\n                    <div class=\"row\">\r\n                        <div class=\"col-xs-3\">\r\n                            <i class=\"fa fa-comments fa-5x\"></i>\r\n                        </div>\r\n                        <div class=\"col-xs-9 text-right\">\r\n                            <div class=\"huge\">26</div>\r\n                            <div>New Comments!</div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <a href=\"#\">\r\n                    <div class=\"panel-footer\">\r\n                        <span class=\"pull-left\">View Details</span>\r\n                        <span class=\"pull-right\"><i class=\"fa fa-arrow-circle-right\"></i></span>\r\n                        <div class=\"clearfix\"></div>\r\n                    </div>\r\n                </a>\r\n            </div>\r\n        </div>\r\n        <div class=\"col-lg-4 col-md-6\">\r\n            <div class=\"panel panel-green\">\r\n                <div class=\"panel-heading\">\r\n                    <div class=\"row\">\r\n                        <div class=\"col-xs-3\">\r\n                            <i class=\"fa fa-tasks fa-5x\"></i>\r\n                        </div>\r\n                        <div class=\"col-xs-9 text-right\">\r\n                            <div class=\"huge\">12</div>\r\n                            <div>New Tasks!</div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <a href=\"#\">\r\n                    <div class=\"panel-footer\">\r\n                        <span class=\"pull-left\">View Details</span>\r\n                        <span class=\"pull-right\"><i class=\"fa fa-arrow-circle-right\"></i></span>\r\n                        <div class=\"clearfix\"></div>\r\n                    </div>\r\n                </a>\r\n            </div>\r\n        </div>\r\n        <div class=\"col-lg-4 col-md-6\">\r\n            <div class=\"panel panel-yellow\">\r\n                <div class=\"panel-heading\">\r\n                    <div class=\"row\">\r\n                        <div class=\"col-xs-3\">\r\n                            <i class=\"fa fa-shopping-cart fa-5x\"></i>\r\n                        </div>\r\n                        <div class=\"col-xs-9 text-right\">\r\n                            <div class=\"huge\">124</div>\r\n                            <div>New Orders!</div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <a href=\"#\">\r\n                    <div class=\"panel-footer\">\r\n                        <span class=\"pull-left\">View Details</span>\r\n                        <span class=\"pull-right\"><i class=\"fa fa-arrow-circle-right\"></i></span>\r\n                        <div class=\"clearfix\"></div>\r\n                    </div>\r\n                </a>\r\n            </div>\r\n        </div>\r\n    </div>";
+	module.exports = "<div id=\"dashbaordView\" class=\"container-fluid\">\n\t\t{{message}}\n\t</div>\n\t <div class=\"row\">\n        <div class=\"col-lg-4 col-md-6\">\n            <div class=\"panel panel-primary\">\n                <div class=\"panel-heading\">\n                    <div class=\"row\">\n                        <div class=\"col-xs-3\">\n                            <i class=\"fa fa-comments fa-5x\"></i>\n                        </div>\n                        <div class=\"col-xs-9 text-right\">\n                            <div class=\"huge\">26</div>\n                            <div>New Comments!</div>\n                        </div>\n                    </div>\n                </div>\n                <a href=\"#\">\n                    <div class=\"panel-footer\">\n                        <span class=\"pull-left\">View Details</span>\n                        <span class=\"pull-right\"><i class=\"fa fa-arrow-circle-right\"></i></span>\n                        <div class=\"clearfix\"></div>\n                    </div>\n                </a>\n            </div>\n        </div>\n        <div class=\"col-lg-4 col-md-6\">\n            <div class=\"panel panel-green\">\n                <div class=\"panel-heading\">\n                    <div class=\"row\">\n                        <div class=\"col-xs-3\">\n                            <i class=\"fa fa-tasks fa-5x\"></i>\n                        </div>\n                        <div class=\"col-xs-9 text-right\">\n                            <div class=\"huge\">12</div>\n                            <div>New Tasks!</div>\n                        </div>\n                    </div>\n                </div>\n                <a href=\"#\">\n                    <div class=\"panel-footer\">\n                        <span class=\"pull-left\">View Details</span>\n                        <span class=\"pull-right\"><i class=\"fa fa-arrow-circle-right\"></i></span>\n                        <div class=\"clearfix\"></div>\n                    </div>\n                </a>\n            </div>\n        </div>\n        <div class=\"col-lg-4 col-md-6\">\n            <div class=\"panel panel-yellow\">\n                <div class=\"panel-heading\">\n                    <div class=\"row\">\n                        <div class=\"col-xs-3\">\n                            <i class=\"fa fa-shopping-cart fa-5x\"></i>\n                        </div>\n                        <div class=\"col-xs-9 text-right\">\n                            <div class=\"huge\">124</div>\n                            <div>New Orders!</div>\n                        </div>\n                    </div>\n                </div>\n                <a href=\"#\">\n                    <div class=\"panel-footer\">\n                        <span class=\"pull-left\">View Details</span>\n                        <span class=\"pull-right\"><i class=\"fa fa-arrow-circle-right\"></i></span>\n                        <div class=\"clearfix\"></div>\n                    </div>\n                </a>\n            </div>\n        </div>\n    </div>";
 
 /***/ },
-/* 60 */
+/* 58 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(61)
-	module.exports = __webpack_require__(63)
+	__webpack_require__(59)
+	module.exports = __webpack_require__(61)
 	
 	if (module.exports.__esModule) module.exports = module.exports.default
-	;(typeof module.exports === "function" ? module.exports.options : module.exports).template = __webpack_require__(65)
+	;(typeof module.exports === "function" ? module.exports.options : module.exports).template = __webpack_require__(63)
 	if (false) {
 	(function () {
 	var hotAPI = require("vue-hot-reload-api")
@@ -14907,23 +14640,23 @@
 	}
 
 /***/ },
-/* 61 */
+/* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(62);
+	var content = __webpack_require__(60);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(48)(content, {});
+	var update = __webpack_require__(46)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-220660e4&file=UserListView.vue!./../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./UserListView.vue", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-220660e4&file=UserListView.vue!./../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./UserListView.vue");
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-f24b1db2&file=UserListView.vue!./../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./UserListView.vue", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-f24b1db2&file=UserListView.vue!./../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./UserListView.vue");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -14933,21 +14666,21 @@
 	}
 
 /***/ },
-/* 62 */
+/* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(47)();
+	exports = module.exports = __webpack_require__(45)();
 	// imports
 	
 	
 	// module
-	exports.push([module.id, "#usersView{\r\n\r\n}", ""]);
+	exports.push([module.id, "#usersView{\n\n}", ""]);
 	
 	// exports
 
 
 /***/ },
-/* 63 */
+/* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -14956,22 +14689,100 @@
 	  value: true
 	});
 	
-	var _userStore = __webpack_require__(64);
+	var _userStore = __webpack_require__(62);
 	
 	var _userStore2 = _interopRequireDefault(_userStore);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
+	var baseUrl = ""; // <template>
+	// 	<div id="usersView" class="container-fluid">
+	// 		<div class="row">
+	// 			<div class="col-xs-12">
+	// 				<h1 class="page-header">User List</h1>
+	//                 <div class="col-xs-4">
+	//                   <input type="text" class="form-control" v-model="searchKey" placeholder="Search User by Email" />
+	//                 </div>
+	// 			</div>
+	// 		</div>
+	// 		<div class="row">
+	// 			<div class="col-xs-12">
+	//                 <table class="table table-hover table-striped">
+	//                     <thead>
+	//                         <tr>
+	//                             <th>ID</th>
+	//                             <th>Email</th>
+	//                             <th>Activation Status</th>
+	//                             <th>Ban Status</th>
+	//                             <th>Join Date</th>
+	//                             <th></th>
+	//                         </tr>
+	//                     </thead>
+	//                     <tbody>
+	//                         <tr v-for="entry in users | filterBy searchKey in 'email' ">
+	//                             <td>{{entry['id']}}</td>
+	//                             <td>{{entry['email']}}</td>
+	//                             <td>
+	//                                 <span v-if="entry['is_activate'] == 0">
+	//                                     Not Activated
+	//                                 </span>
+	//                                 <span v-else>
+	//                                     Activated
+	//                                 </span>
+	//                             </td>
+	//                             <td>
+	//                                 <span v-if="entry['is_blocked'] == 0">
+	//                                     Not Blocked
+	//                                 </span>
+	//                                 <span v-else>
+	//                                     Blocked
+	//                                 </span>
+	//                             </td>
+	//                             <td>{{entry['created_at']}}</td>
+	//                             <td>
+	//                                 <div class="dropdown">
+	//                                   <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu{{entry['id']}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	//                                     Action
+	//                                     <span class="caret"></span>
+	//                                   </button>
+	//                                   <ul class="dropdown-menu" aria-labelledby="dropdownMenu{{entry['id']}}">
+	//                                     <li><a v-link="{ path: '/users/' + entry['id']}">View</a></li>
+	//                                     <li><a @click="sendResetPasswordLink(entry['id'])" href="javascript:void(0)">Reset Password</a></li>
+	//                                     <li>
+	//                                         <a @click="banUser(entry['id'])" href="javascript:void(0)" v-if="entry['is_blocked'] == 0">Ban User</a>
+	//                                         <a @click="unBanUser(entry['id'])" href="javascript:void(0)" v-else>Unban User</a>
+	//                                     </li>
+	//                                   </ul>
+	//                                 </div>
+	//                             </td>
+	//                         </tr>
+	//                     </tbody>
+	//                 </table>
+	//                 <ul class="pagination" v-show="users.length > 0">
+	//                   <li v-for="pageNumber in totalPages" :class="{active: currentPage === pageNumber}">
+	//                     <a href="javascript:void(0)" @click="setPage(pageNumber)" >{{ pageNumber+1 }}</a>
+	//                   </li>
+	//                 </ul>
+	// 			</div>
+	// 		</div>
+	// 	</div>
+	// </template>
+	
+	// <script>
+	
 	exports.default = {
 	  name: 'UserListView',
 	
-	  data: {
-	    users: [],
-	    searchKey: "",
-	    currentPage: 0,
-	    itemsPerPage: 10,
-	    totalCount: 0
+	  data: function data() {
+	    return {
+	      users: [],
+	      searchKey: "",
+	      currentPage: 0,
+	      itemsPerPage: 10,
+	      totalCount: 0
+	    };
 	  },
+	
 	  computed: {
 	    totalPages: function totalPages() {
 	      return Math.ceil(this.totalCount / this.itemsPerPage);
@@ -14980,6 +14791,7 @@
 	  methods: {
 	    setPage: function setPage(pageNumber) {
 	      this.currentPage = pageNumber;
+	      window.history.pushState(null, 'User List', baseUrl + '?page=' + (pageNumber + 1));
 	    },
 	    sendResetPasswordLink: function sendResetPasswordLink(id) {
 	      _userStore2.default.sendResetPasswordLink(id).then(function (message) {
@@ -14996,7 +14808,7 @@
 	    }
 	  },
 	  filters: {
-	    paginate: function paginate(list) {
+	    paginator: function paginator(list) {
 	      this.totalCount = list.length;
 	      if (this.currentPage >= this.totalPages) {
 	        this.currentPage = this.totalPages - 1;
@@ -15005,12 +14817,25 @@
 	      return list.slice(index, index + this.itemsPerPage);
 	    }
 	  },
+	  created: function created() {
+	    var _this = this;
+	
+	    _userStore2.default.getUsersTest().then(function (data) {
+	      _this.users = data.users;
+	    });
+	  },
+	
 	  route: {
 	    data: function data(_ref) {
 	      var to = _ref.to;
 	
-	      return _userStore2.default.getUsersTest().then(function (data) {
-	        return data;
+	      baseUrl = window.location.href.split('?')[0];
+	      return _userStore2.default.getUsers().then(function (data) {
+	        var page = parseInt(to.query.page) - 1 || 0;
+	        return {
+	          users: data.users,
+	          currentPage: page
+	        };
 	      });
 	    }
 	  }
@@ -15018,156 +14843,14 @@
 	// </script>
 
 	// <style>
-
 	// #usersView{
 
 	// }
 
 	// </style>
-	// <template>
-
-	// 	<div id="usersView" class="container-fluid">
-
-	// 		<div class="row">
-
-	// 			<div class="col-xs-12">
-
-	// 				<h1 class="page-header">User List</h1>
-
-	// 				<input type="text" v-model="searchKey" placeholder="Search User by Name" />
-
-	// 			</div>
-
-	// 		</div>
-
-	// 		<div class="row">
-
-	// 			<div class="col-xs-12">
-
-	//                 <table class="table table-hover table-striped">
-
-	//                     <thead>
-
-	//                         <tr>
-
-	//                             <th>ID</th>
-
-	//                             <th>Email</th>
-
-	//                             <th>Activation Status</th>
-
-	//                             <th>Ban Status</th>
-
-	//                             <th>Join Date</th>
-
-	//                             <th></th>
-
-	//                         </tr>
-
-	//                     </thead>
-
-	//                     <tbody>
-
-	//                         <tr v-for="entry in users | paginate">
-
-	//                             <td>{{entry['id']}}</td>
-
-	//                             <td>{{entry['email']}}</td>
-
-	//                             <td>
-
-	//                                 <span v-if="entry['is_activate'] == 0">
-
-	//                                     Not Activated
-
-	//                                 </span>
-
-	//                                 <span v-else>
-
-	//                                     Activated
-
-	//                                 </span>
-
-	//                             </td>
-
-	//                             <td>
-
-	//                                 <span v-if="entry['is_blocked'] == 0">
-
-	//                                     Not Blocked
-
-	//                                 </span>
-
-	//                                 <span v-else>
-
-	//                                     Blocked
-
-	//                                 </span>
-
-	//                             </td>
-
-	//                             <td>{{entry['created_at']}}</td>
-
-	//                             <td>
-
-	//                                 <div class="dropdown">
-
-	//                                   <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu{{entry['id']}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-
-	//                                     Action
-
-	//                                     <span class="caret"></span>
-
-	//                                   </button>
-
-	//                                   <ul class="dropdown-menu" aria-labelledby="dropdownMenu{{entry['id']}}">
-
-	//                                     <li><a v-link="{ path: '/user/' + entry['id']}">View</a></li>
-
-	//                                     <li><a @click="sendResetPasswordLink(entry['id'])" href="javascript:void(0)">Reset Password</a></li>
-
-	//                                     <li>
-
-	//                                         <a @click="banUser(entry['id'])" href="javascript:void(0)" v-if="entry['is_blocked'] == 0">Ban User</a>
-
-	//                                         <a @click="unBanUser(entry['id'])" href="javascript:void(0)" v-else>Unban User</a>
-
-	//                                     </li>
-
-	//                                   </ul>
-
-	//                                 </div>
-
-	//                             </td>
-
-	//                         </tr>
-
-	//                     </tbody>
-
-	//                 </table>
-
-	//                 <ul class="pagination">
-
-	//                   <li v-for="pageNumber in totalPages">
-
-	//                     <a href="#" @click="setPage(pageNumber)" >{{ pageNumber+1 }}</a>
-
-	//                   </li>
-
-	//                 </ul>
-
-	// 			</div>
-
-	// 		</div>
-
-	// 	</div>
-
-	// </template>
-
-	// <script>
 
 /***/ },
-/* 64 */
+/* 62 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -15176,9 +14859,9 @@
 		value: true
 	});
 	
-	var _events = __webpack_require__(56);
+	var _events = __webpack_require__(54);
 	
-	var _es6Promise = __webpack_require__(57);
+	var _es6Promise = __webpack_require__(55);
 	
 	var store = new _events.EventEmitter();
 	
@@ -15289,13 +14972,13 @@
 				created_at: '1992-09-18'
 			}, {
 				id: 2,
-				email: "Tommy2",
+				email: "Jerry",
 				is_blocked: 0,
 				is_activate: 0,
 				created_at: '1992-09-18'
 			}, {
 				id: 3,
-				email: "Tommy3",
+				email: "Curry",
 				is_blocked: 1,
 				is_activate: 0,
 				created_at: '1992-09-18'
@@ -15327,20 +15010,20 @@
 	};
 
 /***/ },
-/* 65 */
+/* 63 */
 /***/ function(module, exports) {
 
-	module.exports = "<div id=\"usersView\" class=\"container-fluid\">\r\n\t\t<div class=\"row\">\r\n\t\t\t<div class=\"col-xs-12\">\r\n\t\t\t\t<h1 class=\"page-header\">User List</h1>\r\n\t\t\t\t<input type=\"text\" v-model=\"searchKey\" placeholder=\"Search User by Name\" />\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t<div class=\"row\">\r\n\t\t\t<div class=\"col-xs-12\">\r\n                <table class=\"table table-hover table-striped\">\r\n                    <thead>\r\n                        <tr>\r\n                            <th>ID</th>\r\n                            <th>Email</th>\r\n                            <th>Activation Status</th>\r\n                            <th>Ban Status</th>\r\n                            <th>Join Date</th>\r\n                            <th></th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n                        <tr v-for=\"entry in users | paginate\">\r\n                            <td>{{entry['id']}}</td>\r\n                            <td>{{entry['email']}}</td>\r\n                            <td>\r\n                                <span v-if=\"entry['is_activate'] == 0\">\r\n                                    Not Activated\r\n                                </span>\r\n                                <span v-else>\r\n                                    Activated\r\n                                </span>\r\n                            </td>\r\n                            <td>\r\n                                <span v-if=\"entry['is_blocked'] == 0\">\r\n                                    Not Blocked\r\n                                </span>\r\n                                <span v-else>\r\n                                    Blocked\r\n                                </span>\r\n                            </td>\r\n                            <td>{{entry['created_at']}}</td>\r\n                            <td>\r\n                                <div class=\"dropdown\">\r\n                                  <button class=\"btn btn-default dropdown-toggle\" type=\"button\" id=\"dropdownMenu{{entry['id']}}\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">\r\n                                    Action\r\n                                    <span class=\"caret\"></span>\r\n                                  </button>\r\n                                  <ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu{{entry['id']}}\">\r\n                                    <li><a v-link=\"{ path: '/user/' + entry['id']}\">View</a></li>\r\n                                    <li><a @click=\"sendResetPasswordLink(entry['id'])\" href=\"javascript:void(0)\">Reset Password</a></li>\r\n                                    <li>\r\n                                        <a @click=\"banUser(entry['id'])\" href=\"javascript:void(0)\" v-if=\"entry['is_blocked'] == 0\">Ban User</a>\r\n                                        <a @click=\"unBanUser(entry['id'])\" href=\"javascript:void(0)\" v-else>Unban User</a>\r\n                                    </li>\r\n                                  </ul>\r\n                                </div>\r\n                            </td>\r\n                        </tr>\r\n                    </tbody>\r\n                </table>\r\n                <ul class=\"pagination\">\r\n                  <li v-for=\"pageNumber in totalPages\">\r\n                    <a href=\"#\" @click=\"setPage(pageNumber)\" >{{ pageNumber+1 }}</a>\r\n                  </li>\r\n                </ul>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>";
+	module.exports = "<div id=\"usersView\" class=\"container-fluid\">\n\t\t<div class=\"row\">\n\t\t\t<div class=\"col-xs-12\">\n\t\t\t\t<h1 class=\"page-header\">User List</h1>\n                <div class=\"col-xs-4\">\n                  <input type=\"text\" class=\"form-control\" v-model=\"searchKey\" placeholder=\"Search User by Email\" />\n                </div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"row\">\n\t\t\t<div class=\"col-xs-12\">\n                <table class=\"table table-hover table-striped\">\n                    <thead>\n                        <tr>\n                            <th>ID</th>\n                            <th>Email</th>\n                            <th>Activation Status</th>\n                            <th>Ban Status</th>\n                            <th>Join Date</th>\n                            <th></th>\n                        </tr>\n                    </thead>\n                    <tbody>\n                        <tr v-for=\"entry in users | filterBy searchKey in 'email' \">\n                            <td>{{entry['id']}}</td>\n                            <td>{{entry['email']}}</td>\n                            <td>\n                                <span v-if=\"entry['is_activate'] == 0\">\n                                    Not Activated\n                                </span>\n                                <span v-else>\n                                    Activated\n                                </span>\n                            </td>\n                            <td>\n                                <span v-if=\"entry['is_blocked'] == 0\">\n                                    Not Blocked\n                                </span>\n                                <span v-else>\n                                    Blocked\n                                </span>\n                            </td>\n                            <td>{{entry['created_at']}}</td>\n                            <td>\n                                <div class=\"dropdown\">\n                                  <button class=\"btn btn-default dropdown-toggle\" type=\"button\" id=\"dropdownMenu{{entry['id']}}\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">\n                                    Action\n                                    <span class=\"caret\"></span>\n                                  </button>\n                                  <ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu{{entry['id']}}\">\n                                    <li><a v-link=\"{ path: '/users/' + entry['id']}\">View</a></li>\n                                    <li><a @click=\"sendResetPasswordLink(entry['id'])\" href=\"javascript:void(0)\">Reset Password</a></li>\n                                    <li>\n                                        <a @click=\"banUser(entry['id'])\" href=\"javascript:void(0)\" v-if=\"entry['is_blocked'] == 0\">Ban User</a>\n                                        <a @click=\"unBanUser(entry['id'])\" href=\"javascript:void(0)\" v-else>Unban User</a>\n                                    </li>\n                                  </ul>\n                                </div>\n                            </td>\n                        </tr>\n                    </tbody>\n                </table>\n                <ul class=\"pagination\" v-show=\"users.length > 0\">\n                  <li v-for=\"pageNumber in totalPages\" :class=\"{active: currentPage === pageNumber}\">\n                    <a href=\"javascript:void(0)\" @click=\"setPage(pageNumber)\" >{{ pageNumber+1 }}</a>\n                  </li>\n                </ul>\n\t\t\t</div>\n\t\t</div>\n\t</div>";
 
 /***/ },
-/* 66 */
+/* 64 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(67)
-	module.exports = __webpack_require__(69)
+	__webpack_require__(65)
+	module.exports = __webpack_require__(67)
 	
 	if (module.exports.__esModule) module.exports = module.exports.default
-	;(typeof module.exports === "function" ? module.exports.options : module.exports).template = __webpack_require__(70)
+	;(typeof module.exports === "function" ? module.exports.options : module.exports).template = __webpack_require__(68)
 	if (false) {
 	(function () {
 	var hotAPI = require("vue-hot-reload-api")
@@ -15358,23 +15041,23 @@
 	}
 
 /***/ },
-/* 67 */
+/* 65 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(68);
+	var content = __webpack_require__(66);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(48)(content, {});
+	var update = __webpack_require__(46)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-69373a50&file=UserView.vue!./../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./UserView.vue", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-69373a50&file=UserView.vue!./../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./UserView.vue");
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-4fcf9069&file=UserView.vue!./../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./UserView.vue", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-4fcf9069&file=UserView.vue!./../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./UserView.vue");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -15384,21 +15067,21 @@
 	}
 
 /***/ },
-/* 68 */
+/* 66 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(47)();
+	exports = module.exports = __webpack_require__(45)();
 	// imports
 	
 	
 	// module
-	exports.push([module.id, "#userView{\r\n    \r\n}", ""]);
+	exports.push([module.id, "#userView{\n    \n}", ""]);
 	
 	// exports
 
 
 /***/ },
-/* 69 */
+/* 67 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -15407,7 +15090,7 @@
 	  value: true
 	});
 	
-	var _userStore = __webpack_require__(64);
+	var _userStore = __webpack_require__(62);
 	
 	var _userStore2 = _interopRequireDefault(_userStore);
 	
@@ -15439,133 +15122,81 @@
 	// </script>
 
 	// <style>
-
 	// #userView{
 
 	// }
 
 	// </style>
 	// <template>
-
 	// 	<a href="javascript:window.history.back();"><i class="fa fa-arrow-left"></i> Back</a>
-
 	// 	<div id="userView" class="container-fluid">
-
 	// 		<div class="row">
-
 	// 			<div class="col-xs-12">
-
 	// 				<h1 class="page-header">User Details</h1>
-
 	// 			</div>
-
 	// 		</div>
-
 	// 		<div class="row">
-
 	// 			<div class="col-xs-12">
-
 	// 				 <div class="panel panel-info">
-
 	//             <div class="panel-heading">
-
 	//               <h3 class="panel-title">{{customer.firstname}} {{customer.lastname}}</h3>
-
 	//             </div>
-
 	//             <div class="panel-body">
-
 	//               <div class="row">
-
 	//                 <div class="col-md-3 col-lg-3 " align="center">
-
 	//                 	<img alt="" :src="customer.avatar_url" class="img-circle img-responsive" />
-
 	//                 </div>
-
 	//                 <div class=" col-md-9 col-lg-9 ">
-
 	//                   <table class="table table-user-information">
-
 	//                     <tbody>
-
 	//                        <tr>
-
 	//                         <td>Birthday:</td>
-
 	//                         <td>{{customer.birthday}}</td>
-
 	//                       </tr>
-
 	//                       <tr>
-
 	//                         <td>Country:</td>
-
 	//                         <td>{{customer.country}}</td>
-
 	//                       </tr>
-
 	//                       <tr>
-
 	//                         <td>City:</td>
-
 	//                         <td>{{customer.addr_city}}</td>
-
 	//                       </tr>
-
 	//                       <tr>
-
 	//                         <td>Languages:</td>
-
 	//                         <td>{{customer.languages}}</td>
-
 	//                       </tr>
-
 	//                       <tr>
-
 	//                         <td>Phone No.:</td>
-
 	//                         <td>{{customer.phoneNo}}</td>
-
 	//                       </tr>
-
 	//                     </tbody>
-
 	//                   </table>
-
-	//                   <a v-link="{path: '/user/' + customer.user_id + '/transactions'}" href="javascript:void(0)" class="btn btn-primary">View Transactions</a>
-
+	//                   <a v-link="{path: '/users/' + customer.user_id + '/transactions'}" href="javascript:void(0)" class="btn btn-primary">View Transactions</a>
 	//                 </div>
-
 	//               </div>
-
 	//             </div>
-
 	//           </div>
-
 	//         </div>
-
 	// 	</div>
-
 	// </template>
 
 	// <script>
 
 /***/ },
-/* 70 */
+/* 68 */
 /***/ function(module, exports) {
 
-	module.exports = "<a href=\"javascript:window.history.back();\"><i class=\"fa fa-arrow-left\"></i> Back</a>\r\n\t<div id=\"userView\" class=\"container-fluid\">\r\n\t\t<div class=\"row\">\r\n\t\t\t<div class=\"col-xs-12\">\r\n\t\t\t\t<h1 class=\"page-header\">User Details</h1>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t<div class=\"row\">\r\n\t\t\t<div class=\"col-xs-12\">\r\n\t\t\t\t <div class=\"panel panel-info\">\r\n            <div class=\"panel-heading\">\r\n              <h3 class=\"panel-title\">{{customer.firstname}} {{customer.lastname}}</h3>\r\n            </div>\r\n            <div class=\"panel-body\">\r\n              <div class=\"row\">\r\n                <div class=\"col-md-3 col-lg-3 \" align=\"center\"> \r\n                \t<img alt=\"\" :src=\"customer.avatar_url\" class=\"img-circle img-responsive\" />\r\n                </div>\r\n                <div class=\" col-md-9 col-lg-9 \"> \r\n                  <table class=\"table table-user-information\">\r\n                    <tbody>\r\n                       <tr>\r\n                        <td>Birthday:</td>\r\n                        <td>{{customer.birthday}}</td>\r\n                      </tr>\r\n                      <tr>\r\n                        <td>Country:</td>\r\n                        <td>{{customer.country}}</td>\r\n                      </tr>\r\n                      <tr>\r\n                        <td>City:</td>\r\n                        <td>{{customer.addr_city}}</td>\r\n                      </tr>\r\n                      <tr>\r\n                        <td>Languages:</td>\r\n                        <td>{{customer.languages}}</td>\r\n                      </tr>\r\n                      <tr>\r\n                        <td>Phone No.:</td>\r\n                        <td>{{customer.phoneNo}}</td>\r\n                      </tr>\r\n                    </tbody>\r\n                  </table>\r\n                  <a v-link=\"{path: '/user/' + customer.user_id + '/transactions'}\" href=\"javascript:void(0)\" class=\"btn btn-primary\">View Transactions</a>\r\n                </div>\r\n              </div>\r\n            </div>\r\n          </div>\r\n        </div>\r\n\t</div>\r\n</template>";
+	module.exports = "<a href=\"javascript:window.history.back();\"><i class=\"fa fa-arrow-left\"></i> Back</a>\n\t<div id=\"userView\" class=\"container-fluid\">\n\t\t<div class=\"row\">\n\t\t\t<div class=\"col-xs-12\">\n\t\t\t\t<h1 class=\"page-header\">User Details</h1>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"row\">\n\t\t\t<div class=\"col-xs-12\">\n\t\t\t\t <div class=\"panel panel-info\">\n            <div class=\"panel-heading\">\n              <h3 class=\"panel-title\">{{customer.firstname}} {{customer.lastname}}</h3>\n            </div>\n            <div class=\"panel-body\">\n              <div class=\"row\">\n                <div class=\"col-md-3 col-lg-3 \" align=\"center\"> \n                \t<img alt=\"\" :src=\"customer.avatar_url\" class=\"img-circle img-responsive\" />\n                </div>\n                <div class=\" col-md-9 col-lg-9 \"> \n                  <table class=\"table table-user-information\">\n                    <tbody>\n                       <tr>\n                        <td>Birthday:</td>\n                        <td>{{customer.birthday}}</td>\n                      </tr>\n                      <tr>\n                        <td>Country:</td>\n                        <td>{{customer.country}}</td>\n                      </tr>\n                      <tr>\n                        <td>City:</td>\n                        <td>{{customer.addr_city}}</td>\n                      </tr>\n                      <tr>\n                        <td>Languages:</td>\n                        <td>{{customer.languages}}</td>\n                      </tr>\n                      <tr>\n                        <td>Phone No.:</td>\n                        <td>{{customer.phoneNo}}</td>\n                      </tr>\n                    </tbody>\n                  </table>\n                  <a v-link=\"{path: '/users/' + customer.user_id + '/transactions'}\" href=\"javascript:void(0)\" class=\"btn btn-primary\">View Transactions</a>\n                </div>\n              </div>\n            </div>\n          </div>\n        </div>\n\t</div>\n</template>";
 
 /***/ },
-/* 71 */
+/* 69 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(72)
-	module.exports = __webpack_require__(74)
+	__webpack_require__(70)
+	module.exports = __webpack_require__(72)
 	
 	if (module.exports.__esModule) module.exports = module.exports.default
-	;(typeof module.exports === "function" ? module.exports.options : module.exports).template = __webpack_require__(76)
+	;(typeof module.exports === "function" ? module.exports.options : module.exports).template = __webpack_require__(74)
 	if (false) {
 	(function () {
 	var hotAPI = require("vue-hot-reload-api")
@@ -15583,23 +15214,23 @@
 	}
 
 /***/ },
-/* 72 */
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(73);
+	var content = __webpack_require__(71);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(48)(content, {});
+	var update = __webpack_require__(46)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-1e32305e&file=TransactionListView.vue!./../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./TransactionListView.vue", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-1e32305e&file=TransactionListView.vue!./../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./TransactionListView.vue");
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-2d940fd0&file=TransactionListView.vue!./../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./TransactionListView.vue", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-2d940fd0&file=TransactionListView.vue!./../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./TransactionListView.vue");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -15609,160 +15240,159 @@
 	}
 
 /***/ },
-/* 73 */
+/* 71 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(47)();
+	exports = module.exports = __webpack_require__(45)();
 	// imports
 	
 	
 	// module
-	exports.push([module.id, "#transactionsView{\r\n\r\n}", ""]);
+	exports.push([module.id, "#transactionsView{\n\n}", ""]);
 	
 	// exports
 
 
 /***/ },
-/* 74 */
+/* 72 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	  value: true
 	});
 	
-	var _transactionStore = __webpack_require__(75);
+	var _transactionStore = __webpack_require__(73);
 	
 	var _transactionStore2 = _interopRequireDefault(_transactionStore);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
+	var baseUrl = ""; // <template>
+	// 	<a v-show="isUserTab" href="javascript:window.history.back();"><i class="fa fa-arrow-left"></i> Back</a>
+	// 	<div id="transactionsView">
+	// 		<div class="row">
+	// 			<div class="col-xs-12">
+	// 				<h1 class="page-header">Transations List</h1>
+	//                 <div class="col-xs-4">
+	//                   <input type="text" class="form-control" v-model="searchKey" placeholder="Search Transaction by Reference No." />
+	//                 </div>
+	// 			</div>
+	// 		</div>
+	// 		<div class="row">
+	// 			<div class="col-xs-12">
+	//                 <table class="table table-hover table-striped">
+	//                     <thead>
+	//                         <tr>
+	//                             <th>ID</th>
+	//                             <th>Time</th>
+	//                             <th></th>
+	//                         </tr>
+	//                     </thead>
+	//                     <tbody>
+	//                         <tr v-for="entry in transactions | filterBy searchKey in 'id'">
+	//                             <td>{{entry['id']}}</td>
+	//                             <td>{{entry['time']}}</td>
+	//                             <td>
+	//                                 <div class="dropdown">
+	//                                   <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu{{entry['id']}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	//                                     Action
+	//                                     <span class="caret"></span>
+	//                                   </button>
+	//                                   <ul class="dropdown-menu" aria-labelledby="dropdownMenu{{entry['id']}}">
+	//                                     <li><a v-link="{ path: '/transactions/' + entry['id']}">View</a></li>
+	//                                   </ul>
+	//                                 </div>
+	//                             </td>
+	//                         </tr>
+	//                     </tbody>
+	//                 </table>
+	//                 <ul class="pagination" v-show="transactions.length > 0">
+	//                   <li v-for="pageNumber in totalPages" :class="{active: currentPage === pageNumber}">
+	//                     <a href="javascript:void(0)" @click="setPage(pageNumber)" >{{ pageNumber+1 }}</a>
+	//                   </li>
+	//                 </ul>
+	// 			</div>
+	// 		</div>
+	// 	</div>
+	// </template>
+	// <script>
+	
 	exports.default = {
-		name: 'TransactionListView',
+	  name: 'TransactionListView',
 	
-		data: function data() {
-			return {
-				isUserTab: pageObject.tabName == "users",
-				data: []
-			};
-		},
+	  data: function data() {
+	    return {
+	      isUserTab: pageObject.tabName == "users",
+	      transactions: [],
+	      searchKey: "",
+	      currentPage: 0,
+	      itemsPerPage: 10,
+	      totalCount: 0
+	    };
+	  },
 	
-		route: {
-			data: function data(_ref) {
-				var to = _ref.to;
+	  computed: {
+	    totalPages: function totalPages() {
+	      return Math.ceil(this.totalCount / this.itemsPerPage);
+	    }
+	  },
+	  methods: {
+	    setPage: function setPage(pageNumber) {
+	      this.currentPage = pageNumber;
+	      window.history.pushState(null, 'Transaction List', baseUrl + '?page=' + (pageNumber + 1));
+	    }
+	  },
+	  filters: {
+	    paginator: function paginator(list) {
+	      this.totalCount = list.length;
+	      if (this.currentPage >= this.totalPages) {
+	        this.currentPage = this.totalPages - 1;
+	      }
+	      var index = this.currentPage * this.itemsPerPage;
+	      return list.slice(index, index + this.itemsPerPage);
+	    }
+	  },
+	  created: function created() {
+	    var _this = this;
 	
-				//check tab name
-				this.isUserTab = pageObject.tabName == "users";
+	    //check tab name
+	    this.isUserTab = pageObject.tabName == "users";
+	    _transactionStore2.default.getTransactionsTest().then(function (data) {
+	      _this.transactions = data.transactions;
+	    });
+	  },
 	
-				return _transactionStore2.default.getTransactionsTest(to.params.id).then(function (data) {
-					return {
-						data: data.transactions
-					};
-				});
-			}
-		}
+	  route: {
+	    data: function data(_ref) {
+	      var to = _ref.to;
+	
+	      baseUrl = window.location.href.split('?')[0];
+	      //check tab name
+	      this.isUserTab = pageObject.tabName == "users";
+	
+	      return _transactionStore2.default.getTransactionsTest(to.params.id).then(function (data) {
+	        var page = parseInt(to.query.page) - 1 || 0;
+	        return {
+	          transactions: data.transactions,
+	          currentPage: page
+	        };
+	      });
+	    }
+	  }
 	
 	};
 	// </script>
-
 	// <style>
-
 	// #transactionsView{
 
 	// }
 
 	// </style>
-	// <template>
-
-	// 	<a v-show="isUserTab" href="javascript:window.history.back();"><i class="fa fa-arrow-left"></i> Back</a>
-
-	// 	<div id="transactionsView">
-
-	// 		<div class="row">
-
-	// 			<div class="col-xs-12">
-
-	// 				<h1 class="page-header">Transations List</h1>
-
-	// 				<input type="text" placeholder="Search Transaction by Reference No." />
-
-	// 			</div>
-
-	// 		</div>
-
-	// 		<div class="row">
-
-	// 			<div class="col-xs-12">
-
-	// 				<div class="table">
-
-	// 					<table class="table table-hover table-striped">
-
-	// 						<thead>
-
-	// 							<tr>
-
-	// 								<th>ID</th>
-
-	// 								<th>Time</th>
-
-	// 								<th></th>
-
-	// 							</tr>
-
-	// 						</thead>
-
-	// 						<tbody>
-
-	// 							<tr v-for="entry in data">
-
-	// 								<td>{{entry['id']}}</td>
-
-	// 								<td>{{entry['time']}}</td>
-
-	// 								<td>
-
-	// 									<div class="dropdown">
-
-	// 									  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu{{entry['id']}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-
-	// 										Action
-
-	// 										<span class="caret"></span>
-
-	// 									  </button>
-
-	// 									  <ul class="dropdown-menu" aria-labelledby="dropdownMenu{{entry['id']}}">
-
-	// 									  	<li><a v-link="{ path: '/transaction/' + entry['id']}">View</a></li>
-
-	// 									  </ul>
-
-	// 									</div>
-
-	// 								</td>
-
-	// 							</tr>
-
-	// 						</tbody>
-
-	// 					</table>
-
-	// 				</div>
-
-	// 			</div>
-
-	// 		</div>
-
-	// 	</div>
-
-	// </template>
-
-	// <script>
 
 /***/ },
-/* 75 */
+/* 73 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -15771,9 +15401,9 @@
 		value: true
 	});
 	
-	var _events = __webpack_require__(56);
+	var _events = __webpack_require__(54);
 	
-	var _es6Promise = __webpack_require__(57);
+	var _es6Promise = __webpack_require__(55);
 	
 	var store = new _events.EventEmitter();
 	
@@ -15826,20 +15456,20 @@
 	};
 
 /***/ },
-/* 76 */
+/* 74 */
 /***/ function(module, exports) {
 
-	module.exports = "<a v-show=\"isUserTab\" href=\"javascript:window.history.back();\"><i class=\"fa fa-arrow-left\"></i> Back</a>\r\n\t<div id=\"transactionsView\">\r\n\t\t<div class=\"row\">\r\n\t\t\t<div class=\"col-xs-12\">\r\n\t\t\t\t<h1 class=\"page-header\">Transations List</h1>\r\n\t\t\t\t<input type=\"text\" placeholder=\"Search Transaction by Reference No.\" />\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t<div class=\"row\">\r\n\t\t\t<div class=\"col-xs-12\">\r\n\t\t\t\t<div class=\"table\">\r\n\t\t\t\t\t<table class=\"table table-hover table-striped\">\r\n\t\t\t\t\t\t<thead>\r\n\t\t\t\t\t\t\t<tr>\r\n\t\t\t\t\t\t\t\t<th>ID</th>\r\n\t\t\t\t\t\t\t\t<th>Time</th>\r\n\t\t\t\t\t\t\t\t<th></th>\r\n\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t</thead>\r\n\t\t\t\t\t\t<tbody>\r\n\t\t\t\t\t\t\t<tr v-for=\"entry in data\">\r\n\t\t\t\t\t\t\t\t<td>{{entry['id']}}</td>\r\n\t\t\t\t\t\t\t\t<td>{{entry['time']}}</td>\r\n\t\t\t\t\t\t\t\t<td>\r\n\t\t\t\t\t\t\t\t\t<div class=\"dropdown\">\r\n\t\t\t\t\t\t\t\t\t  <button class=\"btn btn-default dropdown-toggle\" type=\"button\" id=\"dropdownMenu{{entry['id']}}\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">\r\n\t\t\t\t\t\t\t\t\t\tAction\r\n\t\t\t\t\t\t\t\t\t\t<span class=\"caret\"></span>\r\n\t\t\t\t\t\t\t\t\t  </button>\r\n\t\t\t\t\t\t\t\t\t  <ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu{{entry['id']}}\">\r\n\t\t\t\t\t\t\t\t\t  \t<li><a v-link=\"{ path: '/transaction/' + entry['id']}\">View</a></li>\r\n\t\t\t\t\t\t\t\t\t  </ul>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t</td>\r\n\t\t\t\t\t\t\t</tr>\r\n\t\t\t\t\t\t</tbody>\r\n\t\t\t\t\t</table>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>";
+	module.exports = "<a v-show=\"isUserTab\" href=\"javascript:window.history.back();\"><i class=\"fa fa-arrow-left\"></i> Back</a>\n\t<div id=\"transactionsView\">\n\t\t<div class=\"row\">\n\t\t\t<div class=\"col-xs-12\">\n\t\t\t\t<h1 class=\"page-header\">Transations List</h1>\n                <div class=\"col-xs-4\">\n                  <input type=\"text\" class=\"form-control\" v-model=\"searchKey\" placeholder=\"Search Transaction by Reference No.\" />\n                </div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"row\">\n\t\t\t<div class=\"col-xs-12\">\n                <table class=\"table table-hover table-striped\">\n                    <thead>\n                        <tr>\n                            <th>ID</th>\n                            <th>Time</th>\n                            <th></th>\n                        </tr>\n                    </thead>\n                    <tbody>\n                        <tr v-for=\"entry in transactions | filterBy searchKey in 'id'\">\n                            <td>{{entry['id']}}</td>\n                            <td>{{entry['time']}}</td>\n                            <td>\n                                <div class=\"dropdown\">\n                                  <button class=\"btn btn-default dropdown-toggle\" type=\"button\" id=\"dropdownMenu{{entry['id']}}\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">\n                                    Action\n                                    <span class=\"caret\"></span>\n                                  </button>\n                                  <ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu{{entry['id']}}\">\n                                    <li><a v-link=\"{ path: '/transactions/' + entry['id']}\">View</a></li>\n                                  </ul>\n                                </div>\n                            </td>\n                        </tr>\n                    </tbody>\n                </table>\n                <ul class=\"pagination\" v-show=\"transactions.length > 0\">\n                  <li v-for=\"pageNumber in totalPages\" :class=\"{active: currentPage === pageNumber}\">\n                    <a href=\"javascript:void(0)\" @click=\"setPage(pageNumber)\" >{{ pageNumber+1 }}</a>\n                  </li>\n                </ul>\n\t\t\t</div>\n\t\t</div>\n\t</div>";
 
 /***/ },
-/* 77 */
+/* 75 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(78)
-	module.exports = __webpack_require__(80)
+	__webpack_require__(76)
+	module.exports = __webpack_require__(78)
 	
 	if (module.exports.__esModule) module.exports = module.exports.default
-	;(typeof module.exports === "function" ? module.exports.options : module.exports).template = __webpack_require__(81)
+	;(typeof module.exports === "function" ? module.exports.options : module.exports).template = __webpack_require__(79)
 	if (false) {
 	(function () {
 	var hotAPI = require("vue-hot-reload-api")
@@ -15857,23 +15487,23 @@
 	}
 
 /***/ },
-/* 78 */
+/* 76 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(79);
+	var content = __webpack_require__(77);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(48)(content, {});
+	var update = __webpack_require__(46)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-4925ec13&file=TransactionView.vue!./../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./TransactionView.vue", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-4925ec13&file=TransactionView.vue!./../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./TransactionView.vue");
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-119e37da&file=TransactionView.vue!./../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./TransactionView.vue", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-119e37da&file=TransactionView.vue!./../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./TransactionView.vue");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -15883,21 +15513,21 @@
 	}
 
 /***/ },
-/* 79 */
+/* 77 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(47)();
+	exports = module.exports = __webpack_require__(45)();
 	// imports
 	
 	
 	// module
-	exports.push([module.id, "#transactionView{\r\n\r\n}", ""]);
+	exports.push([module.id, "#transactionView{\n\n}", ""]);
 	
 	// exports
 
 
 /***/ },
-/* 80 */
+/* 78 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -15906,7 +15536,7 @@
 		value: true
 	});
 	
-	var _transactionStore = __webpack_require__(75);
+	var _transactionStore = __webpack_require__(73);
 	
 	var _transactionStore2 = _interopRequireDefault(_transactionStore);
 	
@@ -15935,33 +15565,25 @@
 	
 	};
 	// </script>
-
 	// <style>
-
 	// #transactionView{
 
 	// }
 
 	// </style>
 	// <template>
-
 	// 	<a href="javascript:window.history.back();"><i class="fa fa-arrow-left"></i> Back</a>
-
 	// 	<div id="transactionView">
-
 	// 		Transaction price is: {{trans.price}}
-
 	// 	</div>
-
 	// </template>
-
 	// <script>
 
 /***/ },
-/* 81 */
+/* 79 */
 /***/ function(module, exports) {
 
-	module.exports = "<a href=\"javascript:window.history.back();\"><i class=\"fa fa-arrow-left\"></i> Back</a>\r\n\t<div id=\"transactionView\">\r\n\t\tTransaction price is: {{trans.price}}\r\n\t</div>";
+	module.exports = "<a href=\"javascript:window.history.back();\"><i class=\"fa fa-arrow-left\"></i> Back</a>\n\t<div id=\"transactionView\">\n\t\tTransaction price is: {{trans.price}}\n\t</div>";
 
 /***/ }
 /******/ ]);
