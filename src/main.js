@@ -23,16 +23,16 @@ router.map({
 	'/users': {
 		component: UserListView
 	},
-	'/user/:id': {
+	'/users/:id': {
 		component: UserView
 	},
-	'/user/:id/transactions': {
+	'/users/:id/transactions': {
 		component: TransactionListView
 	},
 	'/transactions': {
 		component: TransactionListView
 	},
-	'/transaction/:id': {
+	'/transactions/:id': {
 		component: TransactionView
 	},
 })

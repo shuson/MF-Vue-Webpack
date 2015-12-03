@@ -3,7 +3,9 @@
 		<div class="row">
 			<div class="col-xs-12">
 				<h1 class="page-header">User List</h1>
-				<input type="text" v-model="searchKey" placeholder="Search User by Name" />
+                <div class="col-xs-4">
+                  <input type="text" class="form-control" v-model="searchKey" placeholder="Search User by Email" />
+                </div>
 			</div>
 		</div>
 		<div class="row">
@@ -47,7 +49,7 @@
                                     <span class="caret"></span>
                                   </button>
                                   <ul class="dropdown-menu" aria-labelledby="dropdownMenu{{entry['id']}}">
-                                    <li><a v-link="{ path: '/user/' + entry['id']}">View</a></li>
+                                    <li><a v-link="{ path: '/users/' + entry['id']}">View</a></li>
                                     <li><a @click="sendResetPasswordLink(entry['id'])" href="javascript:void(0)">Reset Password</a></li>
                                     <li>
                                         <a @click="banUser(entry['id'])" href="javascript:void(0)" v-if="entry['is_blocked'] == 0">Ban User</a>
@@ -71,7 +73,7 @@
 
 <script>
 import store from "../store/userStore"
-
+let baseUrl = ""
 export default {
   name: 'UserListView',
 
@@ -92,6 +94,7 @@ export default {
   methods: {
     setPage: function(pageNumber) {
       this.currentPage = pageNumber
+      window.history.pushState(null, 'User List', baseUrl + '?page=' + (pageNumber+1))
     },
 	sendResetPasswordLink: function(id){
 		store.sendResetPasswordLink(id).then(message=>{
@@ -113,7 +116,7 @@ export default {
       if (this.currentPage >= this.totalPages) {
         this.currentPage = this.totalPages - 1
       }
-      var index = this.currentPage * this.itemsPerPage
+      let index = this.currentPage * this.itemsPerPage
       return list.slice(index, index + this.itemsPerPage)
     }
   },
@@ -124,9 +127,15 @@ export default {
   },
   route:{
   	data({to}){
-      return store.getUsersTest().then(data=>({
-        users: data.users
-      }))
+      baseUrl = window.location.href.split('?')[0]
+      return store.getUsersTest().then(function(data){
+        let page = parseInt(to.query.page) -1 || 0
+        console.log(page)
+        return {
+          users: data.users,
+          currentPage: page
+        }
+      })
     }
   }
 }

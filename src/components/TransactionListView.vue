@@ -29,7 +29,7 @@
 										<span class="caret"></span>
 									  </button>
 									  <ul class="dropdown-menu" aria-labelledby="dropdownMenu{{entry['id']}}">
-									  	<li><a v-link="{ path: '/transaction/' + entry['id']}">View</a></li>
+									  	<li><a v-link="{ path: '/transactions/' + entry['id']}">View</a></li>
 									  </ul>
 									</div>
 								</td>
