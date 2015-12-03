@@ -22,7 +22,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="entry in users | filterBy searchKey in 'email' | paginator ">
+                        <tr v-for="entry in users | filterBy searchKey in 'email' ">
                             <td>{{entry['id']}}</td>
                             <td>{{entry['email']}}</td>
                             <td>
