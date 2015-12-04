@@ -110,7 +110,12 @@ export default {
 	},
 	unBanUser:function(id){
 		alert('unBanUser')
-	}
+	},
+    updateUsers: function(){
+      store.getUsersTest().then(data=>{
+        this.users = data.users
+      })
+    }
   },
   filters: {
     paginator: function(list){
@@ -123,9 +128,7 @@ export default {
     }
   },
   created () {
-    store.getUsersTest().then(data=>{
-      this.users = data.users
-    })
+    this.updateUsers()
   },
   route:{
   	data({to}){
