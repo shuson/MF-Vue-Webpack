@@ -30,5 +30,6 @@
     "es6-promise": "^3.0.2",
     "vue": "^1.0.10",
     "vue-router": "^0.7.5"
-  }
+  },
+  "repository": "https://github.com/shuson/MF-Vue-Webpack.git"
 }

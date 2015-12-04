@@ -133,7 +133,7 @@ export default {
   route:{
   	data({to}){
       baseUrl = window.location.href.split('?')[0]
-      return store.getUsersTest().then(function(data){
+      return store.getUsers().then(function(data){
         let page = parseInt(to.query.page) -1 || 0
         return {
           users: data.users,
