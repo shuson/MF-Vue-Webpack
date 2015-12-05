@@ -15,14 +15,14 @@
                     <thead>
                         <tr>
                             <th>Reference ID</th>
-                            <th>Time</th>
+                            <th>Created Time</th>
                             <th></th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="entry in transactions | filterBy searchKey in 'id'">
                             <td>{{entry['id']}}</td>
-                            <td>{{entry['time']}}</td>
+                            <td>{{entry['created_at']}}</td>
                             <td>
                                 <div class="dropdown">
                                   <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu{{entry['id']}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -74,6 +74,14 @@ export default {
         this.currentPage = pageNumber
         window.history.pushState(null, 'Transaction List', baseUrl + '?page=' + (pageNumber+1))
       },
+      updateTransactions: function(){
+        //check tab name
+		this.isUserTab = pageObject.tabName == "users"
+        
+        store.getTransactions(to.params.id).then(function(data){
+            this.transactions = data.transactions
+        })
+      }
     },
     filters: {
       paginator: function(list){
@@ -85,20 +93,13 @@ export default {
         return list.slice(index, index + this.itemsPerPage)
       }
     },
-	created () {
-      //check tab name
-      this.isUserTab = pageObject.tabName == "users"
-      store.getTransactionsTest().then(data=>{
-        this.transactions = data.transactions
-      })
-    },
 	route:{
 	  data({to}){
         baseUrl = window.location.href.split('?')[0]
 	  	//check tab name
 		this.isUserTab = pageObject.tabName == "users"
 		
-		return store.getTransactionsTest(to.params.id).then(function(data){
+		return store.getTransactions(to.params.id).then(function(data){
           let page = parseInt(to.query.page) -1 || 0
           return {
             transactions: data.transactions,
