@@ -98,21 +98,23 @@ export default {
       this.currentPage = pageNumber
       window.history.pushState(null, 'User List', baseUrl + '?page=' + (pageNumber+1))
     },
-	sendResetPasswordLink: function(id){
-		store.sendResetPasswordLink(id).then(message=>{
-			alert(message);
-		})
-	},
-	banUser: function(id){
-		store.banUser(id).then(message=>{
-			alert(message.result);
-		})
-	},
-	unBanUser:function(id){
-		alert('unBanUser')
-	},
+  	sendResetPasswordLink: function(id){
+  		store.sendResetPasswordLink(id).then(message=>{
+  			alert(message);
+  		})
+  	},
+  	banUser: function(id){
+  		store.banUser(id).then(message=>{
+        this.updateUsers();
+  		})
+  	},
+  	unBanUser:function(id){
+  		store.unBanUser(id).then(message=>{
+        this.updateUsers();
+      })
+  	},
     updateUsers: function(){
-      store.getUsersTest().then(data=>{
+      store.getUsers().then(data=>{
         this.users = data.users
       })
     }
@@ -126,9 +128,6 @@ export default {
       let index = this.currentPage * this.itemsPerPage
       return list.slice(index, index + this.itemsPerPage)
     }
-  },
-  created () {
-    this.updateUsers()
   },
   route:{
   	data({to}){

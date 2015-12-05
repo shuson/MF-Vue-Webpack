@@ -17,18 +17,13 @@ store.getUsers = () => {
 	return new Promise((resolve, reject) => {
 		$.ajax({
 			type: 'GET',
-			url: baseUrl + 'user',
+			url: baseUrl + 'users',
 			dataType: 'json',
 			success: function(data){
 				resolve(data)
 			},
 			fail: function(xhr){
 
-			},
-			statusCode: {
-			   401: function() {
-			     window.open("http://milesfair.com:81/auth/logout","_self")
-			   }
 			}
 		});
 	});
@@ -45,18 +40,13 @@ store.getUsers = () => {
  	return new Promise((resolve, reject) => {
  		$.ajax({
  			type: 'GET',
- 			url: baseUrl + 'user/' + id,
+ 			url: baseUrl + 'users/' + id,
  			dataType: 'json',
 			success: function(data){
 				resolve(data)
 			},
 			fail: function(xhr){
 
-			},
-			statusCode: {
-			   401: function() {
-			     window.open("http://milesfair.com:81/auth/logout","_self")
-			   }
 			}
  		})
  	})
@@ -72,18 +62,35 @@ store.banUser = id => {
 	return new Promise((resolve, reject) => {
 		$.ajax({
 			type: 'GET',
-			url: baseUrl + 'user/ban/' + id,
+			url: baseUrl + 'users/ban/' + id,
 			dataType: 'json',
 			success: function(data){
 				resolve(data)
 			},
 			fail: function(xhr){
 
+			}
+		})
+	})
+}
+
+/**
+ * ubban user by id
+ *
+ * @param {string} id
+ * @return {Promise}
+ */
+store.unBanUser = id => {
+	return new Promise((resolve, reject) => {
+		$.ajax({
+			type: 'GET',
+			url: baseUrl + 'users/unban/' + id,
+			dataType: 'json',
+			success: function(data){
+				resolve(data)
 			},
-			statusCode: {
-			   401: function() {
-			     window.open("http://milesfair.com:81/auth/logout","_self")
-			   }
+			fail: function(xhr){
+
 			}
 		})
 	})

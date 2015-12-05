@@ -59,7 +59,10 @@ export default {
 		},
 	},
 	created () {
-		var tempTagName = location.href.substr(location.href.lastIndexOf("#!") + 3) || "dashboard"
+        let hashIndex = location.href.lastIndexOf("#!") + 3
+        let searchIndex = location.href.lastIndexOf("?")
+		let tempTagName = location.href.substr(hashIndex, searchIndex-hashIndex) || "dashboard"
+
 		this.tabName = tempTagName
 	}
 }
