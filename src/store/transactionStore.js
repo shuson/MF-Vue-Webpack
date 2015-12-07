@@ -30,6 +30,25 @@ store.getTransactions = () => {
 }
 
 /**
+ * getTransactionById
+ *
+ * @return {Promise}
+ */
+
+store.getTransactionById = (id) => {
+	return new Promise((resolve, reject)=>{
+        $.ajax({
+            type: "GET",
+            url: baseUrl + "transactions/" + id,
+            dataType: "json",
+            success: function(data){
+                resolve(data)
+            }
+        })
+    })
+}
+
+/**
  * Test
  *
  * @return {Promise}

@@ -2,7 +2,7 @@
 	<div id="usersView" class="container-fluid">
 		<div class="row">
 			<div class="col-xs-12">
-				<h1 class="page-header">User List</h1>
+				<h1 class="page-header">Users List</h1>
                 <div class="col-xs-4">
                   <input type="text" class="form-control" v-model="searchKey" placeholder="Search User by Email" />
                 </div>

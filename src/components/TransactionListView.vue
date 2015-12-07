@@ -15,6 +15,9 @@
                     <thead>
                         <tr>
                             <th>Reference ID</th>
+                            <th>Number of Tickets</th>
+                            <th>Status</th>
+                            <th>Price</th>
                             <th>Created Time</th>
                             <th></th>
                         </tr>
@@ -22,6 +25,9 @@
                     <tbody>
                         <tr v-for="entry in transactions | filterBy searchKey in 'id'">
                             <td>{{entry['id']}}</td>
+                            <td>{{entry['noOfTicket']}}</td>
+                            <td>{{entry['status']}}</td>
+                            <td>{{entry['price']}}</td>
                             <td>{{entry['created_at']}}</td>
                             <td>
                                 <div class="dropdown">
