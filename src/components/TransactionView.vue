@@ -14,68 +14,58 @@
                 <hr>
                 <div class="row">
                     <div class="col-xs-12 col-md-6 col-lg-6">
-                        <div class="panel panel-default height">
+                        <div class="panel panel-info height">
+                            <div class="panel-heading">
+								<i class="fa fa-info-circle fa-fw"></i> Basic Information
+							</div>
+                            <div class="panel-body">
+                                <strong>Status:</strong> {{transaction.status}}<br>
+                                <strong>Price:</strong> {{transaction.price}}<br>
+                                <strong>Number of Tickets:</strong> {{transaction.noOfTicket}}<br>
+                                <strong>Outbound Time:</strong> {{transaction.outboundDT}}<br>
+                                <strong>Inbound Time:</strong> {{transaction.inboundDT}}<br>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-6 col-lg-6 pull-right">
+                        <div class="panel panel-info height">
                             <div class="panel-heading">
 								<i class="fa fa-plane fa-fw"></i> Flight Details
 							</div>
                             <div class="panel-body">
-                                <strong>Departure Airport:</strong> {{transaction.departureAirport.airportName}} <br />
-                                <strong>Arrival Airport:</strong> {{transaction.arrivalAirport.airportName}} <br />
+                                <strong>Departure Airport:</strong> {{transaction.departureAirport.airportName}}, {{transaction.departureAirport.cityName}}, {{transaction.departureAirport.country}} <br />
+                                <strong>Arrival Airport:</strong> {{transaction.arrivalAirport.airportName}}, {{transaction.arrivalAirport.cityName}}, {{transaction.arrivalAirport.country}} <br />
                                 <strong>Airline:</strong> {{transaction.airline.airlineName}}<br>
                                 <strong>Cabin Class:</strong> {{transaction.cabinClass}}<br>
                             </div>
                         </div>
                     </div>
-                    <div class="col-xs-12 col-md-6 col-lg-6 pull-right">
-                        <div class="panel panel-default height">
-                            <div class="panel-heading">
-								<i class="fa fa-info-circle fa-fw"></i> Shipping Address
-							</div>
-                            <div class="panel-body">
-                                <strong>David Peere:</strong><br>
-                                1111 Army Navy Drive<br>
-                                Arlington<br>
-                                VA<br>
-                                <strong>22 203</strong><br>
-                            </div>
-                        </div>
-                    </div>
                 </div>
                 <div class="col-lg-12">
-					<div class="panel panel-default">
+					<div class="panel panel-primary">
 						<div class="panel-heading">
                             <i class="fa fa-history"></i> Message History
                         </div>
 					</div>
 					<div class="panel-body">
                     	<ul class="timeline col-xs-10 col-xs-offset-1">
-							<li>
+							<li v-for="message in transaction.messages" :class="{'timeline-inverted':($index % 2 == 1)}">
 							  	<div class="timeline-badge info">
 									<i class="glyphicon glyphicon-check"></i>
 								</div>
 							  	<div class="timeline-panel">
 									<div class="timeline-heading">
-								  		<h4 class="timeline-title">{{transaction.seller.firstname}} {{transaction.seller.lastname}}</h4>
-								  		<p><small class="text-muted"><i class="fa fa-clock-o"></i> 11 hours ago via Twitter</small></p>
+								  		<h4 class="timeline-title">
+                                            <a v-link="{ path: '/users/' + message['sender_id']}">
+                                                {{transaction.seller.firstname}} {{transaction.seller.lastname}}
+                                            </a>
+                                        </h4>
+								  		<p><small class="text-muted"><i class="fa fa-clock-o"></i> {{message.post_datetime}}</small></p>
 									</div>
 									<div class="timeline-body">
-								  		<p></p>
+								  		<p>{{message.body}}</p>
 									</div>
 							  	</div>
-							</li>
-							<li class="timeline-inverted">
-							  	<div class="timeline-badge warning">
-									<i class="glyphicon glyphicon-check"></i>
-								</div>
-							  	<div class="timeline-panel">
-									<div class="timeline-heading">
-								  		<h4 class="timeline-title">{{transaction.buyer.firstname}} {{transaction.buyer.lastname}}</h4>
-										<p><small class="text-muted"><i class="fa fa-clock-o"></i> 11 hours ago via Twitter</small></p>
-									</div>
-									<div class="timeline-body">
-								  		<p></p>
-									</div>
-								</div>
 							</li>
 						</ul>
                     </div>
@@ -98,7 +88,8 @@ export default {
 
 	route:{
 	  data({to}){
-		return store.getTransactionByIdTest(to.params.id).then(data=>({
+        this.transaction = {}
+		return store.getTransactionById(to.params.id).then(data=>({
 			transaction: data.transaction
 		}))
 	  }
@@ -129,7 +120,7 @@ export default {
   width: 3px;
   background-color: #eeeeee;
   left: 50%;
-
+  margin-left: -1.5px;
 }
 
 .timeline > li {
@@ -158,7 +149,7 @@ export default {
 }
 
 .timeline > li > .timeline-panel {
-  width: 46%;
+  width: 42%;
   float: left;
   border: 1px solid #d4d4d4;
   border-radius: 2px;
@@ -257,6 +248,7 @@ export default {
 .timeline-body > p,
 .timeline-body > ul {
   margin-bottom: 0;
+  word-wrap: break-word;
 }
 
 .timeline-body > p + p {

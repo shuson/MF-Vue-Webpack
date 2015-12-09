@@ -101,18 +101,20 @@ export default {
     },
 	route:{
 	  data({to}){
-        baseUrl = window.location.href.split('?')[0]
+			this.transactions = []
+			
+    	baseUrl = window.location.href.split('?')[0]
 	  	//check tab name
-		this.isUserTab = pageObject.tabName == "users"
+			this.isUserTab = pageObject.tabName == "users"
 		
-		return store.getTransactionsTest(to.params.id).then(function(data){
+			return store.getTransactions(to.params.id).then(function(data){
           let page = parseInt(to.query.page) -1 || 0
           return {
             transactions: data.transactions,
             currentPage: page
           }
         })
-	  }
+	  	}
 	},
 	
 }

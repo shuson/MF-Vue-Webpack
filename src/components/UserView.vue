@@ -69,6 +69,7 @@ export default {
   
   route: {
   	data({to}) {
+			this.customer = {}
   		return store.getCustomerById(to.params.id).then(data=>({
   			customer: data.customer
   		}))

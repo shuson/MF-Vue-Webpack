@@ -43,6 +43,9 @@ store.getTransactionById = (id) => {
             dataType: "json",
             success: function(data){
                 resolve(data)
+            },
+            fail: function(){
+                alert("oops, something goes wrong!")
             }
         })
     })

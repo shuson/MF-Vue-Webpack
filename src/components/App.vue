@@ -71,8 +71,8 @@ export default {
 		},
 	},
 	created () {
-        let hashIndex = location.href.lastIndexOf("#!") + 3
-        let searchIndex = location.href.lastIndexOf("?")
+    let hashIndex = location.href.lastIndexOf("#!") + 3
+    let searchIndex = location.href.lastIndexOf("?")
 		let tempTagName = location.href.substr(hashIndex, searchIndex-hashIndex) || "dashboard"
 
 		this.tabName = tempTagName
@@ -100,6 +100,10 @@ export default {
     #page-wrapper {
         padding: 10px 50px;
         min-height: 400px;
+    }
+    
+    #ajaxLoader{
+        left: 50%
     }
 }
 

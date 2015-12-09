@@ -23,7 +23,7 @@ store.getUsers = () => {
 				resolve(data)
 			},
 			fail: function(xhr){
-
+				alert("oops, something goes wrong!")
 			}
 		});
 	});

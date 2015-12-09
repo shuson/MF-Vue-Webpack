@@ -131,6 +131,7 @@ export default {
   },
   route:{
   	data({to}){
+    	this.users = []
       baseUrl = window.location.href.split('?')[0]
       return store.getUsers().then(function(data){
         let page = parseInt(to.query.page) -1 || 0
