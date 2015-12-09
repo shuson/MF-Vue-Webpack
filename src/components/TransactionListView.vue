@@ -84,7 +84,7 @@ export default {
         //check tab name
 		this.isUserTab = pageObject.tabName == "users"
         
-        store.getTransactions(to.params.id).then(function(data){
+        store.getTransactionsTest(to.params.id).then(function(data){
             this.transactions = data.transactions
         })
       }
@@ -105,7 +105,7 @@ export default {
 	  	//check tab name
 		this.isUserTab = pageObject.tabName == "users"
 		
-		return store.getTransactions(to.params.id).then(function(data){
+		return store.getTransactionsTest(to.params.id).then(function(data){
           let page = parseInt(to.query.page) -1 || 0
           return {
             transactions: data.transactions,

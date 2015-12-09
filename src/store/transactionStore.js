@@ -55,16 +55,43 @@ store.getTransactionById = (id) => {
  */
 
 store.getTransactionByIdTest = (id) => {
-	if(id == 2){
-		return Promise.resolve({
-			id: 2,
-			price: 233,
-		})
-	}
     return Promise.resolve({
-		id: 3,
-		price: 211,
-	})
+      transaction: {
+                      id: 3,
+                      price: 211,
+                      seller: {
+                        id: 1,
+                        firstname: "seller",
+                        lastname: "test",
+                        avatar_url: "xxx"
+                      },
+                      buyer: {
+                        id: 1,
+                        firstname: "buyer",
+                        lastname: "test",
+                        avatar_url: "xxx"
+                      },
+                      departureAirport: {
+                        id: 1,
+                        airportName: "Changi",
+                        city: "Singapore",
+                        country: "Singapore"
+                      },
+                      arrivalAirport: {
+                        id: 1,
+                        airportName: "JinMen",
+                        city: "Sanya",
+                        country: "China"
+                      },
+                      airline: {
+                        id: 1,
+                        airlineName: "Singapore Air",
+                        city: "Singapore",
+                        country: "Singapore"
+                      },
+                      cabinClass: "First Class"
+                  }
+    })
 }
 
 /**
