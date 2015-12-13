@@ -15,18 +15,18 @@ export default store
 
 store.getTransactions = () => {
 	return new Promise((resolve, reject)=>{
-        $.ajax({
-			type: 'GET',
-			url: baseUrl + 'transactions',
-			dataType: 'json',
-			success: function(data){
-				resolve(data)
-			},
-			fail: function(xhr){
+			$.ajax({
+				type: 'GET',
+				url: baseUrl + 'transactions',
+				dataType: 'json',
+				success: function(data){
+					resolve(data)
+				},
+				fail: function(xhr){
 
-			}
-		});
-    })
+				}
+			});
+   })
 }
 
 /**

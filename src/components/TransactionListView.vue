@@ -70,35 +70,35 @@ export default {
             totalCount: 0
 		}
 	},
-    computed: {
-      totalPages: function() {
-        return Math.ceil(this.totalCount / this.itemsPerPage)
-      }
-    },
-    methods: {
-      setPage: function(pageNumber) {
-        this.currentPage = pageNumber
-        window.history.pushState(null, 'Transaction List', baseUrl + '?page=' + (pageNumber+1))
-      },
-      updateTransactions: function(){
-        //check tab name
-		this.isUserTab = pageObject.tabName == "users"
-        
-        store.getTransactionsTest(to.params.id).then(function(data){
-            this.transactions = data.transactions
-        })
-      }
-    },
-    filters: {
-      paginator: function(list){
-        this.totalCount = list.length
-        if (this.currentPage >= this.totalPages) {
-          this.currentPage = this.totalPages - 1
-        }
-        let index = this.currentPage * this.itemsPerPage
-        return list.slice(index, index + this.itemsPerPage)
-      }
-    },
+	computed: {
+		totalPages: function() {
+			return Math.ceil(this.totalCount / this.itemsPerPage)
+		}
+	},
+	methods: {
+		setPage: function(pageNumber) {
+			this.currentPage = pageNumber
+			window.history.pushState(null, 'Transaction List', baseUrl + '?page=' + (pageNumber+1))
+		},
+		updateTransactions: function(){
+			//check tab name
+	this.isUserTab = pageObject.tabName == "users"
+
+			store.getTransactionsTest(to.params.id).then(function(data){
+					this.transactions = data.transactions
+			})
+		}
+	},
+	filters: {
+		paginator: function(list){
+			this.totalCount = list.length
+			if (this.currentPage >= this.totalPages) {
+				this.currentPage = this.totalPages - 1
+			}
+			let index = this.currentPage * this.itemsPerPage
+			return list.slice(index, index + this.itemsPerPage)
+		}
+	},
 	route:{
 	  data({to}){
 			this.transactions = []

@@ -6,72 +6,81 @@
 				<h1 class="page-header">Transaction Details</h1>
 			</div>
 		</div>
-        <div class="row">
-            <div class="col-xs-12">
-                <div class="text-left">
-                    <h4>Reference Number: {{transaction.id}}</h4>
-                </div>
-                <hr>
-                <div class="row">
-                    <div class="col-xs-12 col-md-6 col-lg-6">
-                        <div class="panel panel-info height">
-                            <div class="panel-heading">
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="text-left">
+					<h4>Reference Number: {{transaction.id}}</h4>
+				</div>
+				<hr>
+				<div class="row">
+					<div class="col-xs-12 col-md-6 col-lg-6">
+						<div class="panel panel-info height">
+							<div class="panel-heading">
 								<i class="fa fa-info-circle fa-fw"></i> Basic Information
 							</div>
-                            <div class="panel-body">
-                                <strong>Status:</strong> {{transaction.status}}<br>
-                                <strong>Price:</strong> {{transaction.price}}<br>
-                                <strong>Number of Tickets:</strong> {{transaction.noOfTicket}}<br>
-                                <strong>Outbound Time:</strong> {{transaction.outboundDT}}<br>
-                                <strong>Inbound Time:</strong> {{transaction.inboundDT}}<br>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xs-12 col-md-6 col-lg-6 pull-right">
-                        <div class="panel panel-info height">
-                            <div class="panel-heading">
+							<div class="panel-body">
+								<strong>Status:</strong> {{transaction.status}}
+								<br>
+								<strong>Price:</strong> {{transaction.price}}
+								<br>
+								<strong>Number of Tickets:</strong> {{transaction.noOfTicket}}
+								<br>
+								<strong>Outbound Time:</strong> {{transaction.outboundDT}}
+								<br>
+								<strong>Inbound Time:</strong> {{transaction.inboundDT}}
+								<br>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-12 col-md-6 col-lg-6 pull-right">
+						<div class="panel panel-info height">
+							<div class="panel-heading">
 								<i class="fa fa-plane fa-fw"></i> Flight Details
 							</div>
-                            <div class="panel-body">
-                                <strong>Departure Airport:</strong> {{transaction.departureAirport.airportName}}, {{transaction.departureAirport.cityName}}, {{transaction.departureAirport.country}} <br />
-                                <strong>Arrival Airport:</strong> {{transaction.arrivalAirport.airportName}}, {{transaction.arrivalAirport.cityName}}, {{transaction.arrivalAirport.country}} <br />
-                                <strong>Airline:</strong> {{transaction.airline.airlineName}}<br>
-                                <strong>Cabin Class:</strong> {{transaction.cabinClass}}<br>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-12">
+							<div class="panel-body">
+								<strong>Departure Airport:</strong> {{transaction.departureAirport.airportName}}, {{transaction.departureAirport.cityName}}, {{transaction.departureAirport.country}}
+								<br />
+								<strong>Arrival Airport:</strong> {{transaction.arrivalAirport.airportName}}, {{transaction.arrivalAirport.cityName}}, {{transaction.arrivalAirport.country}}
+								<br />
+								<strong>Airline:</strong> {{transaction.airline.airlineName}}
+								<br>
+								<strong>Cabin Class:</strong> {{transaction.cabinClass}}
+								<br>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-12">
 					<div class="panel panel-primary">
 						<div class="panel-heading">
-                            <i class="fa fa-history"></i> Message History
-                        </div>
+							<i class="fa fa-history"></i> Message History
+						</div>
 					</div>
 					<div class="panel-body">
-                    	<ul class="timeline col-xs-10 col-xs-offset-1">
+						<ul class="timeline col-xs-10 col-xs-offset-1">
 							<li v-for="message in transaction.messages" :class="{'timeline-inverted':($index % 2 == 1)}">
-							  	<div class="timeline-badge info">
+								<div class="timeline-badge info">
 									<i class="glyphicon glyphicon-check"></i>
 								</div>
-							  	<div class="timeline-panel">
+								<div class="timeline-panel">
 									<div class="timeline-heading">
-								  		<h4 class="timeline-title">
-                                            <a v-link="{ path: '/users/' + message['sender_id']}">
-                                                {{transaction.seller.firstname}} {{transaction.seller.lastname}}
-                                            </a>
-                                        </h4>
-								  		<p><small class="text-muted"><i class="fa fa-clock-o"></i> {{message.post_datetime}}</small></p>
+										<h4 class="timeline-title">
+																							<a v-link="{ path: '/users/' + message['sender_id']}">
+																									{{transaction.seller.firstname}} {{transaction.seller.lastname}}
+																							</a>
+																					</h4>
+										<p><small class="text-muted"><i class="fa fa-clock-o"></i> {{message.post_datetime}}</small></p>
 									</div>
 									<div class="timeline-body">
-								  		<p>{{message.body}}</p>
+										<p>{{message.body}}</p>
 									</div>
-							  	</div>
+								</div>
 							</li>
 						</ul>
-                    </div>
-                </div>
-            </div>
-        </div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </template>
 <script>
@@ -87,13 +96,13 @@ export default {
 	},
 
 	route:{
-	  data({to}){
-        this.transaction = {}
-		return store.getTransactionById(to.params.id).then(data=>({
-			transaction: data.transaction
-		}))
-	  }
-	 }
+		data({to}){
+			this.transaction = {}
+			return store.getTransactionById(to.params.id).then(data=>({
+				transaction: data.transaction
+			}))
+		}
+	}
 
 }
 </script>
