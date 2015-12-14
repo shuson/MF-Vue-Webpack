@@ -20,8 +20,11 @@
             </div>
             <ul class="nav navbar-right top-nav">
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> {{user.name}} <b class="caret"></b></a>
-                    <ul class="dropdown-menu"> 
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="min-width:200px"><i class="fa fa-user"></i> {{user.name}} <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+												<li>
+                            <a href="/password/change"><i class="fa fa-fw fa-key"></i> Change Password</a>
+                        </li>
                         <li>
                             <a href="/auth/logout"><i class="fa fa-fw fa-power-off"></i> Log Out</a>
                         </li>
@@ -116,6 +119,7 @@ export default {
 .top-nav>li {
     display: inline-block;
     float: left;
+		min-width: 200px;
 }
 
 .top-nav>li>a {
@@ -138,6 +142,7 @@ export default {
     float: left;
     position: absolute;
     margin-top: 0;
+		min-width: 200px;
     border: 1px solid rgba(0,0,0,.15);
     border-top-left-radius: 0;
     border-top-right-radius: 0;

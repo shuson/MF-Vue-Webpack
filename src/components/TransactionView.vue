@@ -65,10 +65,10 @@
 								<div class="timeline-panel">
 									<div class="timeline-heading">
 										<h4 class="timeline-title">
-																							<a v-link="{ path: '/users/' + message['sender_id']}">
-																									{{transaction.seller.firstname}} {{transaction.seller.lastname}}
-																							</a>
-																					</h4>
+											<a v-link="{ path: '/users/' + message['sender_id']}">
+												{{transaction.seller.firstname}} {{transaction.seller.lastname}}
+											</a>
+										</h4>
 										<p><small class="text-muted"><i class="fa fa-clock-o"></i> {{message.post_datetime}}</small></p>
 									</div>
 									<div class="timeline-body">
