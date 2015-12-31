@@ -23,6 +23,9 @@ router.map({
 	'/users': {
 		component: UserListView
 	},
+	'/newusers': {
+		component: UserListView
+	},
 	'/users/:id': {
 		component: UserView
 	},

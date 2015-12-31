@@ -30,6 +30,28 @@ store.getUsers = () => {
 }
 
 /**
+ * get new users list
+ *
+ * @param {string} id
+ * @return {Promise}
+ */
+store.getNewUsers = () => {
+	return new Promise((resolve, reject) => {
+		$.ajax({
+			type: 'GET',
+			url: baseUrl + 'newusers',
+			dataType: 'json',
+			success: function(data){
+				resolve(data)
+			},
+			fail: function(xhr){
+				alert("oops, something goes wrong!")
+			}
+		});
+	});
+}
+
+/**
  * get user's profile by id
  *
  * @param {string} id

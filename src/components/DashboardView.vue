@@ -14,7 +14,7 @@
                         </div>
                     </div>
                 </div>
-                <a v-link="{ path: '/users?page=1'}" name="users">
+                <a v-link="{ path: '/newusers'}" name="users">
                     <div class="panel-footer">
                         <span class="pull-left">View Users</span>
                         <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
