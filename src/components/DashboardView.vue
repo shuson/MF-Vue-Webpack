@@ -36,7 +36,7 @@
                         </div>
                     </div>
                 </div>
-                <a v-link="{ path: '/transactions?page=1'}" name="transactions">
+                <a v-link="{ path: '/newtransactions'}" name="transactions">
                     <div class="panel-footer">
                         <span class="pull-left">View Transactions</span>
                         <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>

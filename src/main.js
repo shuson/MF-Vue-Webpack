@@ -35,6 +35,9 @@ router.map({
 	'/transactions': {
 		component: TransactionListView
 	},
+	'/newtransactions': {
+		component: TransactionListView
+	},
 	'/transactions/:id': {
 		component: TransactionView
 	},
